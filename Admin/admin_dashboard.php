@@ -241,6 +241,15 @@ try {
         display: flex;
         flex-direction: column;
         gap: 6px;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        cursor: pointer;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.1);
     }
 
     .stat-card.alt {
@@ -410,7 +419,6 @@ try {
             <li><a href="../Categories/manage_categories.php">Categories</a></li>
             <li><a href="manage_orders.php">Orders</a></li>
             <li><a href="manage_clients.php">Registered Clients</a></li>
-            <li><a href="admin_register.php">Add Admin</a></li>
         </ul>
     </nav>
     <div class="logout-link">
@@ -431,26 +439,26 @@ try {
     </div>
 
     <div class="stats-grid">
-        <div class="stat-card">
+        <a href="../Products/manage_products.php" class="stat-card">
             <h3>Total Products</h3>
             <div class="value"><?= $totalProducts ?></div>
-        </div>
-        <div class="stat-card alt">
+        </a>
+        <a href="../Categories/manage_categories.php" class="stat-card alt">
             <h3>Categories</h3>
             <div class="value"><?= $totalCategories ?></div>
-        </div>
-        <div class="stat-card">
+        </a>
+        <a href="manage_orders.php" class="stat-card">
             <h3>Total Orders</h3>
             <div class="value"><?= $totalOrders ?></div>
-        </div>
-        <div class="stat-card alt">
+        </a>
+        <a href="manage_clients.php" class="stat-card alt">
             <h3>Registered Clients</h3>
             <div class="value"><?= $totalClients ?></div>
-        </div>
-        <div class="stat-card">
+        </a>
+        <a href="manage_orders.php" class="stat-card">
             <h3>Pending Orders</h3>
             <div class="value"><?= $pendingOrders ?></div>
-        </div>
+        </a>
     </div>
 
     <div class="content-grid">
