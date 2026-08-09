@@ -21,7 +21,6 @@ body {
     color: #1f2937;
 }
 
-/* ---------------- Sidebar ---------------- */
 .sidebar {
     width: 240px;
     background-color: var(--navy);
@@ -69,7 +68,6 @@ body {
 .sidebar .logout-link a { display: flex; align-items: center; gap: 10px; color: var(--orange-light); text-decoration: none; font-size: 14px; font-weight: bold; }
 .sidebar .logout-link a:hover { color: var(--orange); }
 
-/* ---------------- Main ---------------- */
 .main { flex: 1; padding: 30px 40px; max-width: 100%; }
 
 .topbar {
@@ -99,7 +97,6 @@ body {
 
 .admin-chip .dot { width: 8px; height: 8px; background-color: var(--green); border-radius: 50%; display: inline-block; }
 
-/* ---------------- Stat cards ---------------- */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; margin-bottom: 30px; }
 
 .stat-card {
@@ -117,7 +114,6 @@ body {
 .stat-card h3 { font-size: 12px; color: #777; text-transform: uppercase; letter-spacing: 0.5px; }
 .stat-card .value { font-size: 28px; font-weight: bold; color: var(--navy); }
 
-/* ---------------- Panels ---------------- */
 .panel { background-color: var(--card); border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; }
 
 .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
@@ -125,7 +121,6 @@ body {
 .panel-header a { font-size: 12px; color: var(--orange); text-decoration: none; font-weight: bold; }
 .panel-header a:hover { text-decoration: underline; }
 
-/* ---------------- Buttons ---------------- */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -150,7 +145,6 @@ body {
 .btn-delete { color: var(--red); }
 .btn-delete:hover { background-color: #ffebee; }
 
-/* ---------------- Tables ---------------- */
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 thead th { text-align: left; color: #8a93a3; text-transform: uppercase; font-size: 11px; letter-spacing: 0.4px; padding: 10px 6px; border-bottom: 2px solid var(--border); }
 tbody td { padding: 12px 6px; border-bottom: 1px solid var(--border); color: #333; vertical-align: middle; }
@@ -182,12 +176,11 @@ tbody tr:hover { background-color: #fafbfd; }
 .stock-ok  { color: var(--green); font-weight: bold; }
 .text-muted-cell { color: var(--text-muted); font-size: 12px; max-width: 260px; }
 
-/* ---------------- Alerts ---------------- */
 .alert { padding: 12px 18px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; font-weight: bold; }
 .alert-success { background: #e8f5e9; color: var(--green); border: 1px solid #c8e6c9; }
 .alert-error { background: #ffebee; color: var(--red); border: 1px solid #ffcdd2; }
 
-/* ---------------- Modal ---------------- */
+
 .modal-overlay {
     display: none;
     position: fixed;

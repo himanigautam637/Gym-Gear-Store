@@ -48,7 +48,7 @@ try {
                 ->execute([$_SESSION['user_id'], $productId, $quantity]);
         }
     } else {
-        /* -------- Guest: store in the session -------- */
+       
         if (!isset($_SESSION['guest_cart'])) {
             $_SESSION['guest_cart'] = [];
         }

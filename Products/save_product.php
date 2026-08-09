@@ -1,6 +1,6 @@
 <?php
 require '../Admin/session_check.php';
-require '../db_connect.php'; // defines $pdo (PDO)
+require '../db_connect.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: manage_products.php');
@@ -43,7 +43,7 @@ try {
         $msg = 'Product added successfully.';
     }
 
-    /* -------- Handle new image uploads (appended to gallery) -------- */
+    
     if (!empty($_FILES['images']['name'][0])) {
         $allowed = ['jpg', 'jpeg', 'png', 'webp'];
         $imgStmt = $pdo->prepare("INSERT INTO product_images (product_id, image_path) VALUES (?, ?)");

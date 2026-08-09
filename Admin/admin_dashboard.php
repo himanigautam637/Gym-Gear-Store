@@ -1,11 +1,6 @@
 <?php
 require 'session_check.php';
-require '../db_connect.php'; // db_connect.php lives in the project root, defines $pdo (PDO)
-
-/* ---------------------------------------------------------
-   Stat queries (PDO)
-   Adjust table/column names below if yours differ.
---------------------------------------------------------- */
+require '../db_connect.php'; 
 function count_rows($pdo, $sql) {
     try {
         $stmt = $pdo->query($sql);
@@ -21,7 +16,6 @@ $totalOrders     = count_rows($pdo, "SELECT COUNT(*) FROM orders");
 $totalClients    = count_rows($pdo, "SELECT COUNT(*) FROM users");
 $pendingOrders   = count_rows($pdo, "SELECT COUNT(*) FROM orders WHERE order_status = 'Pending'");
 
-/* Order status breakdown (for the status bars) */
 $statusCounts = [
     'Pending'   => 0,
     'Confirmed' => 0,
@@ -38,11 +32,11 @@ try {
         }
     }
 } catch (PDOException $e) {
-    // table/column may not exist yet — bars just render at 0
+    
 }
 $statusMax = max(1, max($statusCounts));
 
-/* Recent orders (latest 6) */
+
 $recentOrders = [];
 try {
     $ordersStmt = $pdo->query("
@@ -57,7 +51,6 @@ try {
     $recentOrders = [];
 }
 
-/* Recently added products (latest 5) */
 $recentProducts = [];
 try {
     $productsStmt = $pdo->query("
@@ -102,7 +95,7 @@ try {
         color: #1f2937;
     }
 
-    /* ---------------- Sidebar ---------------- */
+
     .sidebar {
         width: 240px;
         background-color: var(--navy);
@@ -176,7 +169,7 @@ try {
         color: var(--orange);
     }
 
-    /* ---------------- Main ---------------- */
+    
     .main {
         flex: 1;
         padding: 30px 40px;
@@ -224,7 +217,7 @@ try {
         display: inline-block;
     }
 
-    /* ---------------- Stat cards ---------------- */
+   
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -269,7 +262,7 @@ try {
         color: var(--navy);
     }
 
-    /* ---------------- Content grid ---------------- */
+
     .content-grid {
         display: grid;
         grid-template-columns: 1.3fr 1fr;
@@ -309,7 +302,7 @@ try {
 
     .panel-header a:hover { text-decoration: underline; }
 
-    /* ---------------- Order status bars ---------------- */
+
     .status-row {
         display: flex;
         align-items: center;
@@ -353,7 +346,7 @@ try {
         flex-shrink: 0;
     }
 
-    /* ---------------- Tables ---------------- */
+  
     table {
         width: 100%;
         border-collapse: collapse;

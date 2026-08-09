@@ -1,6 +1,6 @@
 <?php
 require 'session_check.php';
-require '../db_connect.php'; // defines $pdo (PDO)
+require '../db_connect.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: manage_orders.php');

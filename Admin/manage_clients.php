@@ -1,6 +1,6 @@
 <?php
 require 'session_check.php';
-require '../db_connect.php'; // defines $pdo (PDO)
+require '../db_connect.php'; 
 
 $clients = [];
 try {

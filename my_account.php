@@ -5,7 +5,7 @@ require $_SERVER['DOCUMENT_ROOT'] . '/Gym-Gear-Store/db_connect.php';
 $isLoggedIn = isset($_SESSION['user_id']);
 $loginError = '';
 
-/* Handle the inline login form on this page */
+
 if (!$isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $identifier = trim($_POST['identifier'] ?? '');
     $password   = $_POST['password'] ?? '';
@@ -38,7 +38,7 @@ if ($isLoggedIn) {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$user) {
-        // Session points to a user that no longer exists — treat as logged out
+       
         session_unset();
         session_destroy();
         $isLoggedIn = false;
@@ -104,7 +104,7 @@ if ($isLoggedIn) {
 
     .wrap { max-width: 900px; margin: 40px auto; padding: 0 20px; }
 
-    /* ---------- Logged-out state (kept as a bright card for form readability) ---------- */
+   
     .guest-card {
         background: #fff;
         border-radius: 10px;
@@ -150,7 +150,7 @@ if ($isLoggedIn) {
     }
     .btn-login:hover { background-color: #e85a29; }
 
-    /* ---------- Logged-in state ---------- */
+    
     .panel { background: var(--card-dark); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); padding: 26px; margin-bottom: 24px; }
     .panel h2 { color: var(--text); font-size: 17px; margin-bottom: 18px; }
 
@@ -171,7 +171,7 @@ if ($isLoggedIn) {
     .badge.Delivered  { background: rgba(76,175,80,0.18); color: var(--green); }
     .badge.Cancelled  { background: rgba(239,83,80,0.18); color: var(--red); }
 
-    /* ---------- Order status tracker ---------- */
+ 
     .order-card { border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; background: rgba(255,255,255,0.02); }
     .order-card:last-child { margin-bottom: 0; }
 

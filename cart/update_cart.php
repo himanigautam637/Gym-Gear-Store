@@ -16,7 +16,6 @@ if ($key === '') {
 }
 
 if (isset($_SESSION['user_id'])) {
-    /* -------- Logged-in: key is cart_id -------- */
     $stmt = $pdo->prepare("SELECT c.product_id, p.stock FROM cart c JOIN products p ON p.product_id = c.product_id WHERE c.cart_id = ? AND c.user_id = ?");
     $stmt->execute([$key, $_SESSION['user_id']]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -26,7 +25,7 @@ if (isset($_SESSION['user_id'])) {
         $pdo->prepare("UPDATE cart SET quantity = ? WHERE cart_id = ?")->execute([$quantity, $key]);
     }
 } else {
-    /* -------- Guest: key is product_id -------- */
+   
     $stmt = $pdo->prepare("SELECT stock FROM products WHERE product_id = ?");
     $stmt->execute([$key]);
     $stock = $stmt->fetchColumn();

@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($identifier === '' || $password === '') {
         $error = 'Please enter both fields.';
     } else {
-        // Match against either username or full_name
+       
         $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR full_name = ?");
         $stmt->execute([$identifier, $identifier]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);

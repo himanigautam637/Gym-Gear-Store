@@ -1,6 +1,6 @@
 <?php
 require '../Admin/session_check.php';
-require '../db_connect.php'; // defines $pdo (PDO)
+require '../db_connect.php'; 
 
 $id = $_GET['id'] ?? '';
 
@@ -10,7 +10,7 @@ if ($id === '') {
 }
 
 try {
-    // Remove image files from disk first (DB rows cascade-delete via FK)
+    
     $imgStmt = $pdo->prepare("SELECT image_path FROM product_images WHERE product_id = ?");
     $imgStmt->execute([$id]);
     foreach ($imgStmt->fetchAll(PDO::FETCH_COLUMN) as $path) {

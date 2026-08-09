@@ -1,6 +1,6 @@
 <?php
 require '../Admin/session_check.php';
-require '../db_connect.php'; // defines $pdo (PDO)
+require '../db_connect.php'; 
 
 $id = $_GET['id'] ?? '';
 
@@ -14,7 +14,7 @@ try {
     $del->execute([$id]);
     header('Location: manage_categories.php?msg=' . urlencode('Category deleted.'));
 } catch (PDOException $e) {
-    // Likely a foreign key constraint failure because products still reference this category
+    
     header('Location: manage_categories.php?err=' . urlencode('Cannot delete: products are still linked to this category.'));
 }
 exit;

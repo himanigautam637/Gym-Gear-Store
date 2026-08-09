@@ -1,6 +1,6 @@
 <?php
 require '../Admin/session_check.php';
-require '../db_connect.php'; // defines $pdo (PDO)
+require '../db_connect.php'; 
 
 $products = [];
 try {
@@ -17,7 +17,7 @@ try {
     $products = [];
 }
 
-/* Fetch full image gallery per product, for the edit modal */
+
 $galleries = [];
 try {
     $imgStmt = $pdo->query("SELECT image_id, product_id, image_path FROM product_images ORDER BY image_id ASC");
@@ -149,7 +149,7 @@ $error   = $_GET['err'] ?? '';
     </div>
 </div>
 
-<!-- Add / Edit Product Modal -->
+
 <div class="modal-overlay" id="productModal">
     <div class="modal-box">
         <h2 id="productModalTitle">Add Product</h2>

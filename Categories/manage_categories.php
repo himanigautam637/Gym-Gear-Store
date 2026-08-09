@@ -1,6 +1,6 @@
 <?php
 require '../Admin/session_check.php';
-require '../db_connect.php'; // defines $pdo (PDO)
+require '../db_connect.php'; 
 
 $categories = [];
 try {
@@ -101,7 +101,6 @@ $error   = $_GET['err'] ?? '';
     </div>
 </div>
 
-<!-- Add / Edit Category Modal -->
 <div class="modal-overlay" id="categoryModal">
     <div class="modal-box">
         <h2 id="categoryModalTitle">Add Category</h2>

@@ -15,7 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $userId = $_SESSION['user_id'];
 
 try {
-    // Re-verify the user still exists (session could be stale)
     $userStmt = $pdo->prepare("SELECT address FROM users WHERE user_id = ?");
     $userStmt->execute([$userId]);
     $userRow = $userStmt->fetch(PDO::FETCH_ASSOC);
@@ -32,7 +31,7 @@ try {
         exit;
     }
 
-    // Load current cart with a fresh stock check
+
     $cartStmt = $pdo->prepare("
         SELECT c.cart_id, c.product_id, c.quantity, p.price, p.stock, p.product_name
         FROM cart c
@@ -47,7 +46,7 @@ try {
         exit;
     }
 
-    // Make sure nothing went out of stock since the cart was last viewed
+    
     foreach ($cartItems as $item) {
         if ($item['quantity'] > $item['stock']) {
             header('Location: ../Cart/cart.php?err=' . urlencode($item['product_name'] . ' only has ' . $item['stock'] . ' left in stock.'));
