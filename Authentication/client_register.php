@@ -2,7 +2,7 @@
 session_start();
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($username) < 4) {
         $error = 'Username must be at least 4 characters long.';
     } else {
-        
+
         $username_valid = true;
         for ($i = 0; $i < strlen($username); $i++) {
             $ch = $username[$i];
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$username_valid) {
             $error = 'Username can only contain letters, numbers, and underscores.';
         } else {
-            
+
             $has_min_length = strlen($password) >= 8;
             $has_number  = false;
             $has_special = false;

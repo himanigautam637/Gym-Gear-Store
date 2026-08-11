@@ -1,0 +1,164 @@
+<?php
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+$cartCount = 0;
+
+if (isset($_SESSION['guest_cart']) && is_array($_SESSION['guest_cart'])) {
+    $cartCount = array_sum($_SESSION['guest_cart']);
+}
+
+if (isset($_SESSION['user_id']) && isset($pdo)) {
+    try {
+        $cartStmt = $pdo->prepare("
+            SELECT COALESCE(SUM(quantity), 0)
+            FROM cart
+            WHERE user_id = ?
+        ");
+        $cartStmt->execute([$_SESSION['user_id']]);
+        $cartCount = (int)$cartStmt->fetchColumn();
+    } catch (PDOException $e) {
+        $cartCount = 0;
+    }
+}
+
+$isCartPage = $currentPage === 'cart.php';
+
+$searchValue = trim($_GET['search'] ?? '');
+?>
+
+<header class="site-header">
+    <div class="header-inner">
+
+        <a href="/Gym-Gear-Store/index.php" class="brand">
+            GYM GEAR STORE
+        </a>
+
+        <nav class="main-nav">
+
+            <a
+                href="/Gym-Gear-Store/index.php"
+                class="<?= $currentPage === 'index.php' ? 'active' : '' ?>"
+            >
+                Home
+            </a>
+
+            <a
+                href="/Gym-Gear-Store/shop.php"
+                class="<?= $currentPage === 'shop.php' ? 'active' : '' ?>"
+            >
+                Shop
+            </a>
+
+            <a
+                href="/Gym-Gear-Store/categories.php"
+                class="<?= $currentPage === 'categories.php' ? 'active' : '' ?>"
+            >
+                Categories
+            </a>
+
+            <a
+                href="/Gym-Gear-Store/about.php"
+                class="<?= $currentPage === 'about.php' ? 'active' : '' ?>"
+            >
+                About Us
+            </a>
+
+            <a
+                href="/Gym-Gear-Store/contact.php"
+                class="<?= $currentPage === 'contact.php' ? 'active' : '' ?>"
+            >
+                Contact Us
+            </a>
+
+            <a
+                href="/Gym-Gear-Store/Cart/cart.php"
+                class="<?= $isCartPage ? 'active' : '' ?>"
+            >
+                Cart
+            </a>
+
+            <a
+                href="/Gym-Gear-Store/my_account.php"
+                class="<?= $currentPage === 'my_account.php' ? 'active' : '' ?>"
+            >
+                My Account
+            </a>
+
+        </nav>
+
+        <div class="header-actions">
+
+            <form
+                class="search-box"
+                action="/Gym-Gear-Store/shop.php"
+                method="GET"
+            >
+                <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <circle cx="11" cy="11" r="7"/>
+                    <path d="M21 21l-4-4"/>
+                </svg>
+
+                <input
+                    type="search"
+                    name="search"
+                    placeholder="Search gear..."
+                    value="<?= htmlspecialchars($searchValue) ?>"
+                    autocomplete="off"
+                >
+            </form>
+
+            <a
+                href="/Gym-Gear-Store/Cart/cart.php"
+                class="icon-btn"
+                title="Cart"
+            >
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                >
+                    <path d="M6 6h15l-1.5 9h-12z"/>
+                    <path d="M6 6L5 2H2"/>
+                    <circle cx="9" cy="20" r="1.3"/>
+                    <circle cx="18" cy="20" r="1.3"/>
+                </svg>
+
+                <?php if ($cartCount > 0): ?>
+                    <span class="cart-badge">
+                        <?= $cartCount ?>
+                    </span>
+                <?php endif; ?>
+            </a>
+
+            <a
+                href="/Gym-Gear-Store/my_account.php"
+                class="icon-btn"
+                title="My Account"
+            >
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                >
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>
+                </svg>
+            </a>
+
+        </div>
+
+    </div>
+</header>

@@ -2,7 +2,7 @@
 session_start();
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($identifier === '' || $password === '') {
         $error = 'Please enter both fields.';
     } else {
-       
+        // Match against either username or full_name
         $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR full_name = ?");
         $stmt->execute([$identifier, $identifier]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id']   = $user['user_id'];
             $_SESSION['full_name'] = $user['full_name'];
             $_SESSION['username']  = $user['username'];
-            header('Location: index.php');
+            header('Location: ../index.php');
             exit;
         } else {
             $error = 'Invalid username/full name or password.';
