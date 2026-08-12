@@ -6,7 +6,23 @@
 
             <div class="brand">
 
-                <div class="brand-icon">+</div>
+                <div class="brand-icon">
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#FFFFFF"
+                        stroke-width="2.2"
+                        stroke-linecap="round"
+                    >
+                        <rect x="1.5" y="9" width="3" height="6" rx="1"></rect>
+                        <rect x="19.5" y="9" width="3" height="6" rx="1"></rect>
+                        <rect x="4.5" y="10.5" width="2.2" height="3" rx="0.5"></rect>
+                        <rect x="17.3" y="10.5" width="2.2" height="3" rx="0.5"></rect>
+                        <line x1="6.7" y1="12" x2="17.3" y2="12"></line>
+                    </svg>
+                </div>
 
                 <div>
                     <div class="brand-name">ONLINE GYM GEAR</div>

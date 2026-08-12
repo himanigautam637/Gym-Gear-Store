@@ -9,9 +9,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $key = $_POST['key'] ?? '';
-$quantity = max(1, (int)($_POST['quantity'] ?? 1));
+$action = $_POST['action'] ?? '';
 
-if ($key === '') {
+if ($key === '' || !in_array($action, ['increase', 'decrease'])) {
     header('Location: cart.php?err=' . urlencode('Invalid cart item.'));
     exit;
 }
@@ -23,6 +23,7 @@ try {
         $stmt = $pdo->prepare("
             SELECT
                 c.cart_id,
+                c.quantity,
                 p.stock,
                 p.status
             FROM cart c
@@ -63,7 +64,13 @@ try {
             exit;
         }
 
-        $quantity = min($quantity, $stock);
+        $quantity = (int)$item['quantity'];
+
+        if ($action === 'increase') {
+            $quantity = min($quantity + 1, $stock);
+        } else {
+            $quantity = max($quantity - 1, 1);
+        }
 
         $update = $pdo->prepare("
             UPDATE cart
@@ -107,7 +114,13 @@ try {
             exit;
         }
 
-        $quantity = min($quantity, $stock);
+        $quantity = (int)($_SESSION['guest_cart'][$productId] ?? 1);
+
+        if ($action === 'increase') {
+            $quantity = min($quantity + 1, $stock);
+        } else {
+            $quantity = max($quantity - 1, 1);
+        }
 
         $_SESSION['guest_cart'][$productId] = $quantity;
     }

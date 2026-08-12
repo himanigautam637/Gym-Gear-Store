@@ -30,7 +30,30 @@ $searchValue = trim($_GET['search'] ?? '');
     <div class="header-inner">
 
         <a href="/Gym-Gear-Store/index.php" class="brand">
-            GYM GEAR STORE
+
+            <div class="brand-icon">
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#FFFFFF"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                >
+                    <rect x="1.5" y="9" width="3" height="6" rx="1"></rect>
+                    <rect x="19.5" y="9" width="3" height="6" rx="1"></rect>
+                    <rect x="4.5" y="10.5" width="2.2" height="3" rx="0.5"></rect>
+                    <rect x="17.3" y="10.5" width="2.2" height="3" rx="0.5"></rect>
+                    <line x1="6.7" y1="12" x2="17.3" y2="12"></line>
+                </svg>
+            </div>
+
+            <div>
+                <div class="brand-name">ONLINE GYM GEAR</div>
+                <div class="brand-tag">STORE</div>
+            </div>
+
         </a>
 
         <nav class="main-nav">
@@ -70,20 +93,6 @@ $searchValue = trim($_GET['search'] ?? '');
                 Contact Us
             </a>
 
-            <a
-                href="/Gym-Gear-Store/Cart/cart.php"
-                class="<?= $isCartPage ? 'active' : '' ?>"
-            >
-                Cart
-            </a>
-
-            <a
-                href="/Gym-Gear-Store/my_account.php"
-                class="<?= $currentPage === 'my_account.php' ? 'active' : '' ?>"
-            >
-                My Account
-            </a>
-
         </nav>
 
         <div class="header-actions">
@@ -115,8 +124,27 @@ $searchValue = trim($_GET['search'] ?? '');
             </form>
 
             <a
+                href="/Gym-Gear-Store/Wishlist/wishlist.php"
+                class="icon-btn <?= $currentPage === 'wishlist.php' ? 'active-icon' : '' ?>"
+                title="Wishlist"
+            >
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                >
+                    <path d="M20.8 4.6c-2-2-5.2-2-7.1 0L12 6.3l-1.7-1.7c-2-2-5.2-2-7.1 0-2 2-2 5.2 0 7.1L12 20.4l8.8-8.7c2-2 2-5.2 0-7.1z"/>
+                </svg>
+
+                <span class="icon-badge" id="wishlistBadge" style="display:none;"></span>
+            </a>
+
+            <a
                 href="/Gym-Gear-Store/Cart/cart.php"
-                class="icon-btn"
+                class="icon-btn <?= $isCartPage ? 'active-icon' : '' ?>"
                 title="Cart"
             >
                 <svg
@@ -134,7 +162,7 @@ $searchValue = trim($_GET['search'] ?? '');
                 </svg>
 
                 <?php if ($cartCount > 0): ?>
-                    <span class="cart-badge">
+                    <span class="icon-badge">
                         <?= $cartCount ?>
                     </span>
                 <?php endif; ?>
@@ -142,7 +170,7 @@ $searchValue = trim($_GET['search'] ?? '');
 
             <a
                 href="/Gym-Gear-Store/my_account.php"
-                class="icon-btn"
+                class="icon-btn <?= $currentPage === 'my_account.php' ? 'active-icon' : '' ?>"
                 title="My Account"
             >
                 <svg
@@ -162,3 +190,5 @@ $searchValue = trim($_GET['search'] ?? '');
 
     </div>
 </header>
+
+<script src="/Gym-Gear-Store/partials/wishlist.js"></script>

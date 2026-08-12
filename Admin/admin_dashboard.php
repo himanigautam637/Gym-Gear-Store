@@ -1,6 +1,7 @@
 <?php
 require 'session_check.php';
 require '../db_connect.php'; 
+
 function count_rows($pdo, $sql) {
     try {
         $stmt = $pdo->query($sql);
@@ -15,6 +16,7 @@ $totalCategories = count_rows($pdo, "SELECT COUNT(*) FROM categories");
 $totalOrders     = count_rows($pdo, "SELECT COUNT(*) FROM orders");
 $totalClients    = count_rows($pdo, "SELECT COUNT(*) FROM users");
 $pendingOrders   = count_rows($pdo, "SELECT COUNT(*) FROM orders WHERE order_status = 'Pending'");
+
 
 $statusCounts = [
     'Pending'   => 0,
@@ -32,7 +34,7 @@ try {
         }
     }
 } catch (PDOException $e) {
-    
+   
 }
 $statusMax = max(1, max($statusCounts));
 
@@ -51,6 +53,7 @@ try {
     $recentOrders = [];
 }
 
+/* Recently added products (latest 5) */
 $recentProducts = [];
 try {
     $productsStmt = $pdo->query("
@@ -94,7 +97,6 @@ try {
         display: flex;
         color: #1f2937;
     }
-
 
     .sidebar {
         width: 240px;
@@ -169,7 +171,7 @@ try {
         color: var(--orange);
     }
 
-    
+   
     .main {
         flex: 1;
         padding: 30px 40px;
@@ -217,7 +219,7 @@ try {
         display: inline-block;
     }
 
-   
+  
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -261,8 +263,6 @@ try {
         font-weight: bold;
         color: var(--navy);
     }
-
-
     .content-grid {
         display: grid;
         grid-template-columns: 1.3fr 1fr;
@@ -346,7 +346,6 @@ try {
         flex-shrink: 0;
     }
 
-  
     table {
         width: 100%;
         border-collapse: collapse;
@@ -412,6 +411,7 @@ try {
             <li><a href="../Categories/manage_categories.php">Categories</a></li>
             <li><a href="manage_orders.php">Orders</a></li>
             <li><a href="manage_clients.php">Registered Clients</a></li>
+            <li><a href="manage_messages.php">Messages</a></li>
         </ul>
     </nav>
     <div class="logout-link">

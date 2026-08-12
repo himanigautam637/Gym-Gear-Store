@@ -40,7 +40,7 @@ $error   = $_GET['err'] ?? '';
             <li><a href="manage_categories.php" class="active">Categories</a></li>
             <li><a href="../Admin/manage_orders.php">Orders</a></li>
             <li><a href="../Admin/manage_clients.php">Registered Clients</a></li>
-            <li><a href="../Admin/admin_register.php">Add Admin</a></li>
+            <li><a href="../Admin/manage_messages.php">Messages</a></li>
         </ul>
     </nav>
     <div class="logout-link">

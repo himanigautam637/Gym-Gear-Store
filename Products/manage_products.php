@@ -2,22 +2,33 @@
 require '../Admin/session_check.php';
 require '../db_connect.php'; 
 
+$search = trim($_GET['search'] ?? '');
+
 $products = [];
 try {
-    $stmt = $pdo->query("
+    $sql = "
         SELECT p.product_id, p.product_name, p.description, p.price, p.stock, p.status,
                p.category_id, cat.category_name,
                (SELECT pi.image_path FROM product_images pi WHERE pi.product_id = p.product_id ORDER BY pi.image_id ASC LIMIT 1) AS thumbnail
         FROM products p
         LEFT JOIN categories cat ON cat.category_id = p.category_id
-        ORDER BY p.product_id DESC
-    ");
+    ";
+    $params = [];
+    if ($search !== '') {
+        $sql .= " WHERE p.product_name LIKE ? OR cat.category_name LIKE ? ";
+        $params[] = '%' . $search . '%';
+        $params[] = '%' . $search . '%';
+    }
+    $sql .= " ORDER BY p.product_id DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $products = [];
 }
 
-
+/* Fetch full image gallery per product, for the edit modal */
 $galleries = [];
 try {
     $imgStmt = $pdo->query("SELECT image_id, product_id, image_path FROM product_images ORDER BY image_id ASC");
@@ -55,6 +66,18 @@ $error   = $_GET['err'] ?? '';
         width: 18px; height: 18px; font-size: 11px; line-height: 18px;
         text-align: center; text-decoration: none; font-weight: bold;
     }
+    .admin-search { display: flex; align-items: center; gap: 8px; flex: 1; max-width: 320px; margin: 0 16px; }
+    .admin-search input {
+        flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px;
+    }
+    .admin-search input:focus { outline: none; border-color: var(--orange); }
+    .admin-search button {
+        background: var(--navy); color: #fff; border: none; border-radius: 6px;
+        padding: 8px 14px; font-size: 12px; font-weight: bold; cursor: pointer;
+    }
+    .admin-search button:hover { background: var(--navy-light); }
+    .admin-search .clear-search { font-size: 12px; color: var(--text-muted); text-decoration: none; white-space: nowrap; }
+    .admin-search .clear-search:hover { color: var(--red); }
 </style>
 </head>
 <body>
@@ -71,7 +94,7 @@ $error   = $_GET['err'] ?? '';
             <li><a href="../Categories/manage_categories.php">Categories</a></li>
             <li><a href="../Admin/manage_orders.php">Orders</a></li>
             <li><a href="../Admin/manage_clients.php">Registered Clients</a></li>
-            <li><a href="../Admin/admin_register.php">Add Admin</a></li>
+            <li><a href="../Admin/manage_messages.php">Messages</a></li>
         </ul>
     </nav>
     <div class="logout-link">
@@ -97,6 +120,13 @@ $error   = $_GET['err'] ?? '';
     <div class="panel">
         <div class="panel-header">
             <h2>All Products</h2>
+            <form action="manage_products.php" method="GET" class="admin-search">
+                <input type="text" name="search" placeholder="Search products..." value="<?= htmlspecialchars($search) ?>">
+                <button type="submit">Search</button>
+                <?php if ($search !== ''): ?>
+                    <a href="manage_products.php" class="clear-search">Clear</a>
+                <?php endif; ?>
+            </form>
             <?php if (empty($categories)): ?>
                 <span style="font-size:12px;color:var(--red);">Add a category first before adding products.</span>
             <?php else: ?>
@@ -118,7 +148,7 @@ $error   = $_GET['err'] ?? '';
             </thead>
             <tbody>
                 <?php if (empty($products)): ?>
-                    <tr><td colspan="8" class="empty-row">No products added yet.</td></tr>
+                    <tr><td colspan="8" class="empty-row"><?= $search !== '' ? 'No products matched "' . htmlspecialchars($search) . '".' : 'No products added yet.' ?></td></tr>
                 <?php else: ?>
                     <?php foreach ($products as $p): ?>
                     <tr>
@@ -137,6 +167,8 @@ $error   = $_GET['err'] ?? '';
                         <td>
                             <button class="btn-icon btn-edit"
                                 onclick='openEditProduct(<?= json_encode($p, JSON_HEX_APOS | JSON_HEX_QUOT) ?>, <?= json_encode($galleries[$p['product_id']] ?? [], JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>Edit</button>
+                            <button class="btn-icon" style="color:var(--green);"
+                                onclick="openRestock(<?= $p['product_id'] ?>, '<?= htmlspecialchars(addslashes($p['product_name'])) ?>')">Restock</button>
                             <a class="btn-icon btn-delete"
                                href="delete_product.php?id=<?= $p['product_id'] ?>"
                                onclick="return confirmDelete('Delete this product and all its images? This cannot be undone.')">Delete</a>
@@ -149,7 +181,7 @@ $error   = $_GET['err'] ?? '';
     </div>
 </div>
 
-
+<!-- Add / Edit Product Modal -->
 <div class="modal-overlay" id="productModal">
     <div class="modal-box">
         <h2 id="productModalTitle">Add Product</h2>
@@ -213,8 +245,30 @@ $error   = $_GET['err'] ?? '';
     </div>
 </div>
 
+<div class="modal-overlay" id="restockModal">
+    <div class="modal-box">
+        <h2 id="restockModalTitle">Restock Product</h2>
+        <form action="restock_product.php" method="POST">
+            <input type="hidden" name="product_id" id="r_product_id" value="">
+            <div class="form-group">
+                <label>Quantity to Add</label>
+                <input type="number" name="restock_qty" min="1" required autofocus>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeModal('restockModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Stock</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="../Admin/assets/admin.js"></script>
 <script>
+function openRestock(productId, productName) {
+    document.getElementById('r_product_id').value = productId;
+    document.getElementById('restockModalTitle').textContent = 'Restock: ' + productName;
+    openModal('restockModal');
+}
 function openAddProduct() {
     document.getElementById('productModalTitle').textContent = 'Add Product';
     document.getElementById('p_id').value = '';

@@ -11,6 +11,7 @@ $error = '';
 
 $name = '';
 $email = '';
+$phone = '';
 $subject = '';
 $message = '';
 
@@ -21,6 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $email =
         trim($_POST['email'] ?? '');
+
+    $phone =
+        trim($_POST['phone'] ?? '');
 
     $subject =
         trim($_POST['subject'] ?? '');
@@ -39,6 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'Please fill in all fields.';
 
     } elseif (
+        !preg_match('/^[a-zA-Z\s]+$/', $name)
+    ) {
+
+        $error =
+            'Name can only contain letters and spaces.';
+
+    } elseif (
         !filter_var(
             $email,
             FILTER_VALIDATE_EMAIL
@@ -48,19 +59,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error =
             'Please enter a valid email address.';
 
+    } elseif (
+        $phone !== '' &&
+        !preg_match('/^[0-9]{7,15}$/', $phone)
+    ) {
+
+        $error =
+            'Phone number can only contain digits (7 to 15 numbers).';
+
     } else {
 
         try {
 
             $stmt = $pdo->prepare("
                 INSERT INTO contact_messages
-                (full_name, email, subject, message)
-                VALUES (?, ?, ?, ?)
+                (full_name, email, phone, subject, message)
+                VALUES (?, ?, ?, ?, ?)
             ");
 
             $stmt->execute([
                 $name,
                 $email,
+                $phone,
                 $subject,
                 $message
             ]);
@@ -70,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $name = '';
             $email = '';
+            $phone = '';
             $subject = '';
             $message = '';
 
@@ -325,6 +346,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     id="name"
                     name="name"
                     value="<?= htmlspecialchars($name) ?>"
+                    pattern="[A-Za-z\s]+"
+                    title="Only letters and spaces are allowed"
                     required
                 >
 
@@ -375,6 +398,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     type="tel"
                     id="phone"
                     name="phone"
+                    value="<?= htmlspecialchars($phone) ?>"
+                    pattern="[0-9]{7,15}"
+                    title="Digits only, 7 to 15 numbers"
+                    inputmode="numeric"
                 >
 
             </div>

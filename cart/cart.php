@@ -217,11 +217,6 @@ try {
         href="/Gym-Gear-Store/partials/site.css"
     >
 
-    <style>
-
-
-    </style>
-
 </head>
 
 <body>
@@ -364,38 +359,37 @@ try {
 
                             <td>
 
-                                <form
-                                    class="quantity-form"
-                                    action="/Gym-Gear-Store/Cart/update_cart.php"
-                                    method="POST"
-                                >
+                                <div class="qty-stepper">
 
-                                    <input
-                                        type="hidden"
-                                        name="key"
-                                        value="<?= htmlspecialchars($item['key']) ?>"
+                                    <form
+                                        action="/Gym-Gear-Store/Cart/update_cart.php"
+                                        method="POST"
                                     >
+                                        <input type="hidden" name="key" value="<?= htmlspecialchars($item['key']) ?>">
+                                        <input type="hidden" name="action" value="decrease">
+                                        <button
+                                            type="submit"
+                                            class="qty-btn"
+                                            <?= (int)$item['quantity'] <= 1 ? 'disabled' : '' ?>
+                                        >&minus;</button>
+                                    </form>
 
-                                    <input
-                                        class="quantity-input"
-                                        type="number"
-                                        name="quantity"
-                                        value="<?= (int)$item['quantity'] ?>"
-                                        min="1"
-                                        max="<?= max(
-                                            1,
-                                            (int)$item['stock']
-                                        ) ?>"
+                                    <span class="qty-value"><?= (int)$item['quantity'] ?></span>
+
+                                    <form
+                                        action="/Gym-Gear-Store/Cart/update_cart.php"
+                                        method="POST"
                                     >
+                                        <input type="hidden" name="key" value="<?= htmlspecialchars($item['key']) ?>">
+                                        <input type="hidden" name="action" value="increase">
+                                        <button
+                                            type="submit"
+                                            class="qty-btn"
+                                            <?= (int)$item['quantity'] >= (int)$item['stock'] ? 'disabled' : '' ?>
+                                        >+</button>
+                                    </form>
 
-                                    <button
-                                        type="submit"
-                                        class="update-btn"
-                                    >
-                                        Update
-                                    </button>
-
-                                </form>
+                                </div>
 
                                 <?php if (
                                     (int)$item['quantity']

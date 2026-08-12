@@ -47,7 +47,7 @@ $message = $_GET['msg'] ?? '';
             <li><a href="../Categories/manage_categories.php">Categories</a></li>
             <li><a href="manage_orders.php" class="active">Orders</a></li>
             <li><a href="manage_clients.php">Registered Clients</a></li>
-            <li><a href="admin_register.php">Add Admin</a></li>
+            <li><a href="manage_messages.php">Messages</a></li>
         </ul>
     </nav>
     <div class="logout-link">

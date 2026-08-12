@@ -7,6 +7,16 @@ $currentPage = 'shop';
 
 $search = trim($_GET['search'] ?? '');
 $categoryId = (int)($_GET['category'] ?? 0);
+$sort = $_GET['sort'] ?? 'newest';
+
+$sortOptions = [
+    'newest'     => 'p.product_id DESC',
+    'price_low'  => 'p.price ASC',
+    'price_high' => 'p.price DESC',
+    'name_az'    => 'p.product_name ASC',
+];
+
+$orderBy = $sortOptions[$sort] ?? $sortOptions['newest'];
 
 $products = [];
 $categoryName = '';
@@ -61,9 +71,7 @@ try {
         $params[] = $categoryId;
     }
 
-    $sql .= "
-        ORDER BY p.product_id DESC
-    ";
+    $sql .= " ORDER BY $orderBy ";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -106,6 +114,28 @@ try {
         rel="stylesheet"
         href="/Gym-Gear-Store/partials/site.css"
     >
+
+    <style>
+        .sort-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .sort-bar label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .sort-bar select {
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            color: var(--text);
+            font-size: 13px;
+        }
+    </style>
 
 </head>
 
@@ -195,6 +225,18 @@ try {
 
             <?php endif; ?>
 
+            <form class="sort-bar" method="GET" action="/Gym-Gear-Store/shop.php" id="sortForm">
+                <?php if ($search !== ''): ?><input type="hidden" name="search" value="<?= htmlspecialchars($search) ?>"><?php endif; ?>
+                <?php if ($categoryId > 0): ?><input type="hidden" name="category" value="<?= $categoryId ?>"><?php endif; ?>
+                <label for="sortSelect">Sort by</label>
+                <select id="sortSelect" name="sort" onchange="document.getElementById('sortForm').submit()">
+                    <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>Newest First</option>
+                    <option value="price_low" <?= $sort === 'price_low' ? 'selected' : '' ?>>Price: Low to High</option>
+                    <option value="price_high" <?= $sort === 'price_high' ? 'selected' : '' ?>>Price: High to Low</option>
+                    <option value="name_az" <?= $sort === 'name_az' ? 'selected' : '' ?>>Name: A to Z</option>
+                </select>
+            </form>
+
             <?php if (empty($products)): ?>
 
                 <div class="content-panel">
@@ -242,6 +284,8 @@ try {
     </section>
 
 </main>
+
+<?php include __DIR__ . '/partials/footer.php'; ?>
 
 </body>
 </html>

@@ -35,7 +35,7 @@ if (!$isLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ident
             $_SESSION['full_name'] = $loginUser['full_name'];
             $_SESSION['username']  = $loginUser['username'];
 
-        
+            /* Merge the guest session cart into their real cart in the DB */
             if (!empty($_SESSION['guest_cart'])) {
                 foreach ($_SESSION['guest_cart'] as $productId => $qty) {
                     $stockStmt = $pdo->prepare("SELECT stock FROM products WHERE product_id = ?");
@@ -106,6 +106,7 @@ if ($isLoggedIn) {
     .wrap { max-width: 800px; margin: 40px auto; padding: 0 20px; }
     h1 { color: var(--text); font-size: 22px; margin-bottom: 20px; }
 
+    /* ---------- Login-gate card (kept bright for form readability) ---------- */
     .guest-card { background:#fff; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.35); max-width:400px; margin:30px auto; overflow:hidden; }
     .guest-card .head { background:var(--navy); color:#fff; padding:28px 20px; text-align:center; }
     .guest-card .head h1 { font-size:19px; letter-spacing:1px; margin:0; }
@@ -124,7 +125,7 @@ if ($isLoggedIn) {
     .btn-login { width:100%; padding:12px; background:var(--orange); color:#fff; border:none; border-radius:6px; font-size:15px; font-weight:bold; cursor:pointer; }
     .btn-login:hover { background:#e85a29; }
 
-    .register-link { text-align:center; font-size:13px; margin-top:16px; }
+    .register-link { text-align:center; font-size:13px; margin-top:16px; color:#333; }
     .register-link a { color:var(--orange); font-weight:bold; text-decoration:none; }
 
 
