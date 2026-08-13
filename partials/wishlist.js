@@ -31,7 +31,7 @@ function toggleWishlist(productId, el) {
 
     saveWishlist(list);
 
-    if (window.location.pathname.indexOf('wishlist.php') !== -1) {
+    if (document.getElementById('wishlistContainer')) {
         loadWishlistPage();
     }
 }
@@ -68,6 +68,38 @@ function applyWishlistHeartStates() {
     });
 }
 
+function proceedToOrderFromWishlist() {
+    var ids = getWishlist();
+    if (ids.length === 0) return;
+
+    var btn = document.getElementById('wishlistOrderBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Adding to cart...';
+    }
+
+    var requests = ids.map(function (id) {
+        var form = new URLSearchParams();
+        form.append('product_id', id);
+        form.append('quantity', 1);
+        return fetch('/Gym-Gear-Store/Cart/add_to_cart.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: form.toString()
+        });
+    });
+
+    Promise.all(requests).then(function () {
+        window.location.href = '/Gym-Gear-Store/Payments/checkout.php';
+    }).catch(function () {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Proceed to Order';
+        }
+        alert('Could not add all items to cart. Please try again.');
+    });
+}
+
 function loadWishlistPage() {
     var container = document.getElementById('wishlistContainer');
     if (!container) return;
@@ -82,12 +114,21 @@ function loadWishlistPage() {
     container.innerHTML = '<div class="content-panel">Loading your wishlist...</div>';
 
     fetch('/Gym-Gear-Store/Wishlist/wishlist_data.php?ids=' + ids.join(','))
-        .then(function (res) { return res.json(); })
+        .then(function (res) {
+            if (!res.ok) throw new Error('Request failed');
+            return res.json();
+        })
         .then(function (products) {
-            if (!products.length) {
+            if (!products || !products.length) {
                 container.innerHTML = '<div class="empty-cart"><h2>Your wishlist is empty</h2><p>Tap the heart icon on any product to save it here.</p><a href="/Gym-Gear-Store/shop.php" class="checkout-btn">Start Shopping</a></div>';
                 return;
             }
+
+            var topBar = document.createElement('div');
+            topBar.className = 'wishlist-topbar';
+            topBar.innerHTML =
+                '<span>' + products.length + ' item(s) saved</span>' +
+                '<button type="button" id="wishlistOrderBtn" class="checkout-btn" onclick="proceedToOrderFromWishlist()">Proceed to Order</button>';
 
             var grid = document.createElement('div');
             grid.className = 'prod-grid';
@@ -101,17 +142,19 @@ function loadWishlistPage() {
                     ? '<img src="/Gym-Gear-Store/uploads/products/' + p.thumbnail + '" alt="' + p.product_name + '">'
                     : '<div class="placeholder-icon">+</div>';
 
+                var detailUrl = '/Gym-Gear-Store/product-details.php?id=' + p.product_id;
+
                 card.innerHTML =
                     '<div class="prod-image">' +
                         (outOfStock ? '<div class="stock-tag">Out of Stock</div>' : '') +
-                        imageHtml +
                         '<button type="button" class="wishlist-heart active" onclick="removeFromWishlist(' + p.product_id + ')" title="Remove from wishlist">' +
                             '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 21s-7.5-4.6-10-9.3C0.3 8 2 4 6 4c2 0 3.5 1 4.5 2.5C11.5 5 13 4 15 4c4 0 5.7 4 4 7.7C19.5 16.4 12 21 12 21z"/></svg>' +
                         '</button>' +
+                        '<a href="' + detailUrl + '" class="prod-image-link">' + imageHtml + '</a>' +
                     '</div>' +
                     '<div class="prod-body">' +
                         '<div class="prod-cat">' + (p.category_name || 'Gym Gear') + '</div>' +
-                        '<div class="prod-name">' + p.product_name + '</div>' +
+                        '<a href="' + detailUrl + '" class="prod-name">' + p.product_name + '</a>' +
                         '<div class="prod-footer">' +
                             '<span class="prod-price">Rs. ' + Number(p.price).toFixed(2) + '</span>' +
                             (outOfStock
@@ -124,15 +167,22 @@ function loadWishlistPage() {
             });
 
             container.innerHTML = '';
+            container.appendChild(topBar);
             container.appendChild(grid);
         })
         .catch(function () {
-            container.innerHTML = '<div class="content-panel"><h2>Could not load wishlist</h2><p>Please try again.</p></div>';
+            container.innerHTML = '<div class="content-panel"><h2>Could not load wishlist</h2><p>Please refresh the page and try again.</p></div>';
         });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+function initWishlist() {
     updateWishlistBadge();
     applyWishlistHeartStates();
     loadWishlistPage();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWishlist);
+} else {
+    initWishlist();
+}

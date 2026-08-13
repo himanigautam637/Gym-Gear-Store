@@ -1,5 +1,9 @@
 <?php
 session_start();
+
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 require $_SERVER['DOCUMENT_ROOT'] . '/Gym-Gear-Store/db_connect.php';
 
 $isLoggedIn = isset($_SESSION['user_id']);
@@ -106,7 +110,7 @@ if ($isLoggedIn) {
     .wrap { max-width: 800px; margin: 40px auto; padding: 0 20px; }
     h1 { color: var(--text); font-size: 22px; margin-bottom: 20px; }
 
-    /* ---------- Login-gate card (kept bright for form readability) ---------- */
+
     .guest-card { background:#fff; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,0.35); max-width:400px; margin:30px auto; overflow:hidden; }
     .guest-card .head { background:var(--navy); color:#fff; padding:28px 20px; text-align:center; }
     .guest-card .head h1 { font-size:19px; letter-spacing:1px; margin:0; }
@@ -240,6 +244,14 @@ if ($isLoggedIn) {
 <?php endif; ?>
 
 </div>
+
+<script>
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+</script>
 
 </body>
 </html>

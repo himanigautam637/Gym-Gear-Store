@@ -36,6 +36,27 @@ try {
     $customer = $userStmt->fetch(PDO::FETCH_ASSOC);
 
     if ($customer && !empty($customer['email'])) {
+        $itemsStmt = $pdo->prepare("
+            SELECT oi.quantity, oi.price, p.product_name
+            FROM order_items oi
+            JOIN products p ON p.product_id = oi.product_id
+            WHERE oi.order_id = ?
+        ");
+        $itemsStmt->execute([$orderId]);
+        $orderItems = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $itemsHtml = '';
+        foreach ($orderItems as $item) {
+            $lineTotal = (float)$item['price'] * (int)$item['quantity'];
+            $itemsHtml .= "
+                <tr>
+                    <td style='padding:8px 0;border-bottom:1px solid #e6e9ee;'>" . htmlspecialchars($item['product_name']) . "</td>
+                    <td style='padding:8px 0;border-bottom:1px solid #e6e9ee;text-align:center;'>x" . (int)$item['quantity'] . "</td>
+                    <td style='padding:8px 0;border-bottom:1px solid #e6e9ee;text-align:right;'>Rs. " . number_format($lineTotal, 2) . "</td>
+                </tr>
+            ";
+        }
+
         $mailer = new SmtpMailer(
             SMTP_HOST,
             SMTP_PORT,
@@ -51,8 +72,21 @@ try {
             <div style='font-family:Arial,sans-serif;max-width:480px;margin:auto;'>
                 <h2 style='color:#0C2340;'>Order Status Update</h2>
                 <p>Hi " . htmlspecialchars($customer['full_name']) . ",</p>
-                <p>Your order <strong>#$orderId</strong> (Rs. " . number_format((float)$customer['total_amount'], 2) . ") is now:</p>
+                <p>Your order <strong>#$orderId</strong> is now:</p>
                 <p style='font-size:20px;font-weight:bold;color:#FF6B35;'>" . htmlspecialchars($status) . "</p>
+                <table style='width:100%;border-collapse:collapse;margin:20px 0;font-size:14px;'>
+                    <thead>
+                        <tr>
+                            <th style='text-align:left;padding-bottom:8px;border-bottom:2px solid #0C2340;color:#0C2340;'>Product</th>
+                            <th style='text-align:center;padding-bottom:8px;border-bottom:2px solid #0C2340;color:#0C2340;'>Qty</th>
+                            <th style='text-align:right;padding-bottom:8px;border-bottom:2px solid #0C2340;color:#0C2340;'>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        $itemsHtml
+                    </tbody>
+                </table>
+                <p style='text-align:right;font-size:16px;font-weight:bold;color:#0C2340;'>Order Total: Rs. " . number_format((float)$customer['total_amount'], 2) . "</p>
                 <p>Thank you for shopping with Online Gym Gear Store.</p>
             </div>
         ";

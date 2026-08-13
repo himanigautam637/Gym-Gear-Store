@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 require $_SERVER['DOCUMENT_ROOT'] . '/Gym-Gear-Store/db_connect.php';
 
 $currentPage = 'cart.php';
@@ -479,6 +483,14 @@ try {
 </main>
 
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/Gym-Gear-Store/partials/footer.php'; ?>
+
+<script>
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+</script>
 
 </body>
 </html>

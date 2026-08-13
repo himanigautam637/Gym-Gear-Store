@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $productId = (int)($_POST['product_id'] ?? 0);
 $quantity = max(1, (int)($_POST['quantity'] ?? 1));
+$redirect = $_POST['redirect'] ?? 'cart';
 
 if ($productId <= 0) {
     header('Location: /Gym-Gear-Store/shop.php?err=' . urlencode('Invalid product.'));
@@ -104,6 +105,11 @@ try {
             $currentQuantity + $quantity,
             $stock
         );
+    }
+
+    if ($redirect === 'checkout') {
+        header('Location: /Gym-Gear-Store/Payments/checkout.php');
+        exit;
     }
 
     header('Location: /Gym-Gear-Store/Cart/cart.php?msg=' . urlencode('Product added to cart.'));

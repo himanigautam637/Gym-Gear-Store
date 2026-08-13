@@ -31,6 +31,8 @@ $uid = 'pc_' . $p['product_id'];
 
         <?php endif; ?>
 
+        <a href="/Gym-Gear-Store/product-details.php?id=<?= (int)$p['product_id'] ?>" class="prod-image-link">
+
         <?php if (!empty($p['thumbnail'])): ?>
 
             <img
@@ -54,6 +56,8 @@ $uid = 'pc_' . $p['product_id'];
 
         <?php endif; ?>
 
+        </a>
+
     </div>
 
     <div class="prod-body">
@@ -62,9 +66,9 @@ $uid = 'pc_' . $p['product_id'];
             <?= htmlspecialchars($p['category_name'] ?? 'Gym Gear') ?>
         </div>
 
-        <div class="prod-name">
+        <a href="/Gym-Gear-Store/product-details.php?id=<?= (int)$p['product_id'] ?>" class="prod-name">
             <?= htmlspecialchars($p['product_name']) ?>
-        </div>
+        </a>
 
         <div class="prod-footer">
 
