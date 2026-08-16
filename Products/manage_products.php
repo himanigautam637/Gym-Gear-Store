@@ -28,7 +28,6 @@ try {
     $products = [];
 }
 
-/* Fetch full image gallery per product, for the edit modal */
 $galleries = [];
 try {
     $imgStmt = $pdo->query("SELECT image_id, product_id, image_path FROM product_images ORDER BY image_id ASC");
@@ -55,7 +54,7 @@ $error   = $_GET['err'] ?? '';
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Products | Gym Gear Store</title>
-<link rel="stylesheet" href="../Admin/assets/admin.css">
+<link rel="stylesheet" href="../Admin/assets/admin.css?v=2">
 <style>
     .gallery { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
     .gallery-item { position: relative; }
@@ -97,9 +96,6 @@ $error   = $_GET['err'] ?? '';
             <li><a href="../Admin/manage_messages.php">Messages</a></li>
         </ul>
     </nav>
-    <div class="logout-link">
-        <a href="../Admin/logout.php">Log Out</a>
-    </div>
 </div>
 
 <div class="main">
@@ -108,9 +104,12 @@ $error   = $_GET['err'] ?? '';
             <h1>Products</h1>
             <div class="date"><?= count($products) ?> total products</div>
         </div>
-        <div class="admin-chip">
-            <span class="dot"></span>
-            <?= htmlspecialchars($_SESSION['admin_name']) ?>
+        <div class="topbar-actions">
+            <div class="admin-chip">
+                <span class="dot"></span>
+                <?= htmlspecialchars($_SESSION['admin_name']) ?>
+            </div>
+            <a href="../Admin/logout.php" class="topbar-logout">Log Out</a>
         </div>
     </div>
 
@@ -168,7 +167,7 @@ $error   = $_GET['err'] ?? '';
                             <button class="btn-icon btn-edit"
                                 onclick='openEditProduct(<?= json_encode($p, JSON_HEX_APOS | JSON_HEX_QUOT) ?>, <?= json_encode($galleries[$p['product_id']] ?? [], JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>Edit</button>
                             <button class="btn-icon" style="color:var(--green);"
-                                onclick="openRestock(<?= $p['product_id'] ?>, '<?= htmlspecialchars(addslashes($p['product_name'])) ?>')">Restock</button>
+                                onclick="openRestock(<?= $p['product_id'] ?>, '<?= htmlspecialchars(addslashes($p['product_name'])) ?>', <?= $p['price'] ?>)">Restock</button>
                             <a class="btn-icon btn-delete"
                                href="delete_product.php?id=<?= $p['product_id'] ?>"
                                onclick="return confirmDelete('Delete this product and all its images? This cannot be undone.')">Delete</a>
@@ -252,11 +251,16 @@ $error   = $_GET['err'] ?? '';
             <input type="hidden" name="product_id" id="r_product_id" value="">
             <div class="form-group">
                 <label>Quantity to Add</label>
-                <input type="number" name="restock_qty" min="1" required autofocus>
+                <input type="number" name="restock_qty" id="r_restock_qty" min="1" required autofocus>
+            </div>
+            <div class="form-group">
+                <label>Price (Rs.)</label>
+                <input type="number" name="new_price" id="r_new_price" step="0.01" min="0" required>
+                <span style="font-size:11px;color:var(--text-muted);">Update this if the supplier price has changed, or leave as-is to keep the current price.</span>
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn btn-outline" onclick="closeModal('restockModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add Stock</button>
+                <button type="submit" class="btn btn-primary">Save Restock</button>
             </div>
         </form>
     </div>
@@ -264,8 +268,10 @@ $error   = $_GET['err'] ?? '';
 
 <script src="../Admin/assets/admin.js"></script>
 <script>
-function openRestock(productId, productName) {
+function openRestock(productId, productName, currentPrice) {
     document.getElementById('r_product_id').value = productId;
+    document.getElementById('r_restock_qty').value = '';
+    document.getElementById('r_new_price').value = currentPrice;
     document.getElementById('restockModalTitle').textContent = 'Restock: ' + productName;
     openModal('restockModal');
 }

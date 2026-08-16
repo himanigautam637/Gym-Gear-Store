@@ -1,7 +1,6 @@
 <?php
 require '../Admin/session_check.php';
 require '../db_connect.php'; 
-
 $categories = [];
 try {
     $stmt = $pdo->query("
@@ -24,7 +23,7 @@ $error   = $_GET['err'] ?? '';
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Categories | Gym Gear Store</title>
-<link rel="stylesheet" href="../Admin/assets/admin.css">
+<link rel="stylesheet" href="../Admin/assets/admin.css?v=2">
 </head>
 <body>
 
@@ -43,9 +42,6 @@ $error   = $_GET['err'] ?? '';
             <li><a href="../Admin/manage_messages.php">Messages</a></li>
         </ul>
     </nav>
-    <div class="logout-link">
-        <a href="../Admin/logout.php">Log Out</a>
-    </div>
 </div>
 
 <div class="main">
@@ -54,9 +50,12 @@ $error   = $_GET['err'] ?? '';
             <h1>Categories</h1>
             <div class="date"><?= count($categories) ?> total categories</div>
         </div>
-        <div class="admin-chip">
-            <span class="dot"></span>
-            <?= htmlspecialchars($_SESSION['admin_name']) ?>
+        <div class="topbar-actions">
+            <div class="admin-chip">
+                <span class="dot"></span>
+                <?= htmlspecialchars($_SESSION['admin_name']) ?>
+            </div>
+            <a href="../Admin/logout.php" class="topbar-logout">Log Out</a>
         </div>
     </div>
 
@@ -101,6 +100,7 @@ $error   = $_GET['err'] ?? '';
     </div>
 </div>
 
+<!-- Add / Edit Category Modal -->
 <div class="modal-overlay" id="categoryModal">
     <div class="modal-box">
         <h2 id="categoryModalTitle">Add Category</h2>

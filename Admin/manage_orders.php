@@ -24,7 +24,7 @@ $message = $_GET['msg'] ?? '';
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Orders | Gym Gear Store</title>
-<link rel="stylesheet" href="assets/admin.css">
+<link rel="stylesheet" href="assets/admin.css?v=2">
 <style>
     .badge.Confirmed { background: #e0f2f1; color: #00695c; }
     .badge.Packed { background: #fff8e1; color: #f57f17; }
@@ -50,9 +50,6 @@ $message = $_GET['msg'] ?? '';
             <li><a href="manage_messages.php">Messages</a></li>
         </ul>
     </nav>
-    <div class="logout-link">
-        <a href="logout.php">Log Out</a>
-    </div>
 </div>
 
 <div class="main">
@@ -61,9 +58,12 @@ $message = $_GET['msg'] ?? '';
             <h1>Orders</h1>
             <div class="date"><?= count($orders) ?> total orders</div>
         </div>
-        <div class="admin-chip">
-            <span class="dot"></span>
-            <?= htmlspecialchars($_SESSION['admin_name']) ?>
+        <div class="topbar-actions">
+            <div class="admin-chip">
+                <span class="dot"></span>
+                <?= htmlspecialchars($_SESSION['admin_name']) ?>
+            </div>
+            <a href="logout.php" class="topbar-logout">Log Out</a>
         </div>
     </div>
 

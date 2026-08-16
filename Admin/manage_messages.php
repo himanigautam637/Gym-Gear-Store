@@ -1,6 +1,7 @@
 <?php
 require 'session_check.php';
-require '../db_connect.php'; 
+require '../db_connect.php';
+
 $messages = [];
 try {
     $stmt = $pdo->query("SELECT message_id, full_name, email, phone, subject, message, sent_at FROM contact_messages ORDER BY sent_at DESC");
@@ -26,7 +27,7 @@ $deleteMsg = $_GET['msg'] ?? '';
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Messages | Gym Gear Store</title>
-<link rel="stylesheet" href="assets/admin.css">
+<link rel="stylesheet" href="assets/admin.css?v=2">
 <style>
     .msg-layout { display: grid; grid-template-columns: 380px 1fr; gap: 20px; align-items: start; }
     @media (max-width: 1000px) { .msg-layout { grid-template-columns: 1fr; } }
@@ -70,9 +71,6 @@ $deleteMsg = $_GET['msg'] ?? '';
             <li><a href="manage_messages.php" class="active">Messages</a></li>
         </ul>
     </nav>
-    <div class="logout-link">
-        <a href="logout.php">Log Out</a>
-    </div>
 </div>
 
 <div class="main">
@@ -81,9 +79,12 @@ $deleteMsg = $_GET['msg'] ?? '';
             <h1>Messages</h1>
             <div class="date"><?= count($messages) ?> message<?= count($messages) === 1 ? '' : 's' ?> received</div>
         </div>
-        <div class="admin-chip">
-            <span class="dot"></span>
-            <?= htmlspecialchars($_SESSION['admin_name']) ?>
+        <div class="topbar-actions">
+            <div class="admin-chip">
+                <span class="dot"></span>
+                <?= htmlspecialchars($_SESSION['admin_name']) ?>
+            </div>
+            <a href="logout.php" class="topbar-logout">Log Out</a>
         </div>
     </div>
 

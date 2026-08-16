@@ -34,7 +34,7 @@ try {
         }
     }
 } catch (PDOException $e) {
-   
+
 }
 $statusMax = max(1, max($statusCounts));
 
@@ -53,7 +53,6 @@ try {
     $recentOrders = [];
 }
 
-/* Recently added products (latest 5) */
 $recentProducts = [];
 try {
     $productsStmt = $pdo->query("
@@ -98,6 +97,7 @@ try {
         color: #1f2937;
     }
 
+  
     .sidebar {
         width: 240px;
         background-color: var(--navy);
@@ -171,7 +171,7 @@ try {
         color: var(--orange);
     }
 
-   
+    
     .main {
         flex: 1;
         padding: 30px 40px;
@@ -219,7 +219,30 @@ try {
         display: inline-block;
     }
 
-  
+    .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .topbar-logout {
+        background-color: #fdecea;
+        color: var(--red);
+        border: 1px solid #f5c6c2;
+        border-radius: 30px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background 0.15s ease;
+    }
+
+    .topbar-logout:hover {
+        background-color: var(--red);
+        color: #fff;
+    }
+
+   
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -263,6 +286,8 @@ try {
         font-weight: bold;
         color: var(--navy);
     }
+
+
     .content-grid {
         display: grid;
         grid-template-columns: 1.3fr 1fr;
@@ -301,7 +326,6 @@ try {
     }
 
     .panel-header a:hover { text-decoration: underline; }
-
 
     .status-row {
         display: flex;
@@ -345,6 +369,7 @@ try {
         color: var(--navy);
         flex-shrink: 0;
     }
+
 
     table {
         width: 100%;
@@ -414,9 +439,6 @@ try {
             <li><a href="manage_messages.php">Messages</a></li>
         </ul>
     </nav>
-    <div class="logout-link">
-        <a href="logout.php">Log Out</a>
-    </div>
 </div>
 
 <div class="main">
@@ -425,9 +447,12 @@ try {
             <h1>Dashboard</h1>
             <div class="date"><?= date('l, F j, Y') ?></div>
         </div>
-        <div class="admin-chip">
-            <span class="dot"></span>
-            <?= htmlspecialchars($_SESSION['admin_name']) ?>
+        <div class="topbar-actions">
+            <div class="admin-chip">
+                <span class="dot"></span>
+                <?= htmlspecialchars($_SESSION['admin_name']) ?>
+            </div>
+            <a href="logout.php" class="topbar-logout">Log Out</a>
         </div>
     </div>
 

@@ -46,12 +46,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
 
             $has_min_length = strlen($password) >= 8;
+            $has_upper = false;
+            $has_lower = false;
             $has_number  = false;
             $has_special = false;
             $special_chars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
 
             for ($i = 0; $i < strlen($password); $i++) {
                 $char = $password[$i];
+                if ($char >= 'A' && $char <= 'Z') {
+                    $has_upper = true;
+                }
+                if ($char >= 'a' && $char <= 'z') {
+                    $has_lower = true;
+                }
                 if ($char >= '0' && $char <= '9') {
                     $has_number = true;
                 }
@@ -62,6 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!$has_min_length) {
                 $error = 'Password must be at least 8 characters long.';
+            } elseif (!$has_upper) {
+                $error = 'Password must contain at least one uppercase letter.';
+            } elseif (!$has_lower) {
+                $error = 'Password must contain at least one lowercase letter.';
             } elseif (!$has_number) {
                 $error = 'Password must contain at least one number.';
             } elseif (!$has_special) {
@@ -312,6 +324,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Must contain:
                     <ul>
                         <li id="rule-length" class="invalid">At least 8 characters</li>
+                        <li id="rule-upper" class="invalid">At least one uppercase letter</li>
+                        <li id="rule-lower" class="invalid">At least one lowercase letter</li>
                         <li id="rule-number" class="invalid">At least one number</li>
                         <li id="rule-special" class="invalid">At least one special character</li>
                     </ul>
@@ -331,11 +345,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         var specialChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
 
         var hasLength = password.length >= 8;
+        var hasUpper = false;
+        var hasLower = false;
         var hasNumber = false;
         var hasSpecial = false;
 
         for (var i = 0; i < password.length; i++) {
             var ch = password.charAt(i);
+            if (ch >= 'A' && ch <= 'Z') {
+                hasUpper = true;
+            }
+            if (ch >= 'a' && ch <= 'z') {
+                hasLower = true;
+            }
             if (ch >= '0' && ch <= '9') {
                 hasNumber = true;
             }
@@ -345,6 +367,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         setRuleState('rule-length', hasLength);
+        setRuleState('rule-upper', hasUpper);
+        setRuleState('rule-lower', hasLower);
         setRuleState('rule-number', hasNumber);
         setRuleState('rule-special', hasSpecial);
     }

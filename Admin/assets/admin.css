@@ -21,6 +21,7 @@ body {
     color: #1f2937;
 }
 
+
 .sidebar {
     width: 240px;
     background-color: var(--navy);
@@ -68,6 +69,7 @@ body {
 .sidebar .logout-link a { display: flex; align-items: center; gap: 10px; color: var(--orange-light); text-decoration: none; font-size: 14px; font-weight: bold; }
 .sidebar .logout-link a:hover { color: var(--orange); }
 
+
 .main { flex: 1; padding: 30px 40px; max-width: 100%; }
 
 .topbar {
@@ -97,6 +99,15 @@ body {
 
 .admin-chip .dot { width: 8px; height: 8px; background-color: var(--green); border-radius: 50%; display: inline-block; }
 
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.topbar-logout {
+    background-color: #fdecea; color: var(--red); border: 1px solid #f5c6c2;
+    border-radius: 30px; padding: 9px 18px; font-size: 13px; font-weight: bold;
+    text-decoration: none; transition: background 0.15s ease;
+}
+.topbar-logout:hover { background-color: var(--red); color: #fff; }
+
+
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; margin-bottom: 30px; }
 
 .stat-card {
@@ -121,6 +132,7 @@ body {
 .panel-header a { font-size: 12px; color: var(--orange); text-decoration: none; font-weight: bold; }
 .panel-header a:hover { text-decoration: underline; }
 
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -144,6 +156,7 @@ body {
 .btn-edit:hover { background-color: #e3f2fd; }
 .btn-delete { color: var(--red); }
 .btn-delete:hover { background-color: #ffebee; }
+
 
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 thead th { text-align: left; color: #8a93a3; text-transform: uppercase; font-size: 11px; letter-spacing: 0.4px; padding: 10px 6px; border-bottom: 2px solid var(--border); }
@@ -175,6 +188,7 @@ tbody tr:hover { background-color: #fafbfd; }
 .stock-low { color: var(--red); font-weight: bold; }
 .stock-ok  { color: var(--green); font-weight: bold; }
 .text-muted-cell { color: var(--text-muted); font-size: 12px; max-width: 260px; }
+
 
 .alert { padding: 12px 18px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; font-weight: bold; }
 .alert-success { background: #e8f5e9; color: var(--green); border: 1px solid #c8e6c9; }
