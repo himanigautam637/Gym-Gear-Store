@@ -437,7 +437,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Contact Us at:
 
             <strong>
-                9826574874
+                9826574985
             </strong>
 
         </div>
