@@ -1,6 +1,7 @@
 <?php
 require '../Admin/session_check.php';
 require '../db_connect.php'; 
+
 $categories = [];
 try {
     $stmt = $pdo->query("
@@ -40,6 +41,7 @@ $error   = $_GET['err'] ?? '';
             <li><a href="../Admin/manage_orders.php">Orders</a></li>
             <li><a href="../Admin/manage_clients.php">Registered Clients</a></li>
             <li><a href="../Admin/manage_messages.php">Messages</a></li>
+            <li><a href="../Admin/analytics.php">Analytics</a></li>
         </ul>
     </nav>
 </div>
@@ -100,7 +102,7 @@ $error   = $_GET['err'] ?? '';
     </div>
 </div>
 
-<!-- Add / Edit Category Modal -->
+
 <div class="modal-overlay" id="categoryModal">
     <div class="modal-box">
         <h2 id="categoryModalTitle">Add Category</h2>

@@ -1,6 +1,6 @@
 <?php
 require 'session_check.php';
-require '../db_connect.php';
+require '../db_connect.php'; 
 
 $messages = [];
 try {
@@ -69,6 +69,7 @@ $deleteMsg = $_GET['msg'] ?? '';
             <li><a href="manage_orders.php">Orders</a></li>
             <li><a href="manage_clients.php">Registered Clients</a></li>
             <li><a href="manage_messages.php" class="active">Messages</a></li>
+            <li><a href="analytics.php">Analytics</a></li>
         </ul>
     </nav>
 </div>

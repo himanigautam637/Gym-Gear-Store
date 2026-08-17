@@ -28,6 +28,7 @@ try {
     $products = [];
 }
 
+
 $galleries = [];
 try {
     $imgStmt = $pdo->query("SELECT image_id, product_id, image_path FROM product_images ORDER BY image_id ASC");
@@ -94,6 +95,7 @@ $error   = $_GET['err'] ?? '';
             <li><a href="../Admin/manage_orders.php">Orders</a></li>
             <li><a href="../Admin/manage_clients.php">Registered Clients</a></li>
             <li><a href="../Admin/manage_messages.php">Messages</a></li>
+            <li><a href="../Admin/analytics.php">Analytics</a></li>
         </ul>
     </nav>
 </div>

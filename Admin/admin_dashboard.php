@@ -1,6 +1,6 @@
 <?php
 require 'session_check.php';
-require '../db_connect.php'; 
+require '../db_connect.php';
 
 function count_rows($pdo, $sql) {
     try {
@@ -34,7 +34,7 @@ try {
         }
     }
 } catch (PDOException $e) {
-
+    
 }
 $statusMax = max(1, max($statusCounts));
 
@@ -52,6 +52,7 @@ try {
 } catch (PDOException $e) {
     $recentOrders = [];
 }
+
 
 $recentProducts = [];
 try {
@@ -97,7 +98,7 @@ try {
         color: #1f2937;
     }
 
-  
+    
     .sidebar {
         width: 240px;
         background-color: var(--navy);
@@ -171,7 +172,6 @@ try {
         color: var(--orange);
     }
 
-    
     .main {
         flex: 1;
         padding: 30px 40px;
@@ -242,7 +242,7 @@ try {
         color: #fff;
     }
 
-   
+    
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -287,7 +287,7 @@ try {
         color: var(--navy);
     }
 
-
+    
     .content-grid {
         display: grid;
         grid-template-columns: 1.3fr 1fr;
@@ -327,6 +327,7 @@ try {
 
     .panel-header a:hover { text-decoration: underline; }
 
+   
     .status-row {
         display: flex;
         align-items: center;
@@ -437,6 +438,7 @@ try {
             <li><a href="manage_orders.php">Orders</a></li>
             <li><a href="manage_clients.php">Registered Clients</a></li>
             <li><a href="manage_messages.php">Messages</a></li>
+            <li><a href="analytics.php">Analytics</a></li>
         </ul>
     </nav>
 </div>

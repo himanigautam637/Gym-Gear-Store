@@ -48,6 +48,7 @@ $message = $_GET['msg'] ?? '';
             <li><a href="manage_orders.php" class="active">Orders</a></li>
             <li><a href="manage_clients.php">Registered Clients</a></li>
             <li><a href="manage_messages.php">Messages</a></li>
+            <li><a href="analytics.php">Analytics</a></li>
         </ul>
     </nav>
 </div>

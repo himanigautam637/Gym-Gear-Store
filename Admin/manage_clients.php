@@ -1,6 +1,6 @@
 <?php
 require 'session_check.php';
-require '../db_connect.php'; 
+require '../db_connect.php';
 
 $clients = [];
 try {
@@ -40,6 +40,7 @@ $message = $_GET['msg'] ?? '';
             <li><a href="manage_orders.php">Orders</a></li>
             <li><a href="manage_clients.php" class="active">Registered Clients</a></li>
             <li><a href="manage_messages.php">Messages</a></li>
+            <li><a href="analytics.php">Analytics</a></li>
         </ul>
     </nav>
 </div>
