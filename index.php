@@ -123,7 +123,6 @@ try {
 
 <main>
 
-    <!-- HERO -->
 
     <section class="hero">
 

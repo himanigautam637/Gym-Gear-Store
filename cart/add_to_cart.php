@@ -22,7 +22,7 @@ try {
     $stmt = $pdo->prepare("
         SELECT stock, status
         FROM products
-        WHERE product_id = ?
+        WHERE product_id = ? AND is_active = 1
     ");
 
     $stmt->execute([$productId]);

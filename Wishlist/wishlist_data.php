@@ -28,7 +28,7 @@ if (!empty($ids)) {
                 ) AS thumbnail
             FROM products p
             LEFT JOIN categories c ON c.category_id = p.category_id
-            WHERE p.product_id IN ($placeholders)
+            WHERE p.product_id IN ($placeholders) AND p.is_active = 1
         ");
         $stmt->execute($ids);
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);

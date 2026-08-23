@@ -1,6 +1,6 @@
 <?php
 require '../Admin/session_check.php';
-require '../db_connect.php'; 
+require '../db_connect.php';
 
 $id = $_GET['id'] ?? '';
 
@@ -10,21 +10,11 @@ if ($id === '') {
 }
 
 try {
-    
-    $imgStmt = $pdo->prepare("SELECT image_path FROM product_images WHERE product_id = ?");
-    $imgStmt->execute([$id]);
-    foreach ($imgStmt->fetchAll(PDO::FETCH_COLUMN) as $path) {
-        $file = '../uploads/products/' . $path;
-        if (file_exists($file)) {
-            unlink($file);
-        }
-    }
+    $stmt = $pdo->prepare("UPDATE products SET is_active = 0 WHERE product_id = ?");
+    $stmt->execute([$id]);
 
-    $del = $pdo->prepare("DELETE FROM products WHERE product_id = ?");
-    $del->execute([$id]);
-
-    header('Location: manage_products.php?msg=' . urlencode('Product deleted.'));
+    header('Location: manage_products.php?msg=' . urlencode('Product hidden from the store.'));
 } catch (PDOException $e) {
-    header('Location: manage_products.php?err=' . urlencode('Could not delete product: ' . $e->getMessage()));
+    header('Location: manage_products.php?err=' . urlencode('Could not hide product.'));
 }
 exit;

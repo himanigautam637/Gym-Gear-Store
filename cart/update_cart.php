@@ -25,7 +25,8 @@ try {
                 c.cart_id,
                 c.quantity,
                 p.stock,
-                p.status
+                p.status,
+                p.is_active
             FROM cart c
             INNER JOIN products p
                 ON p.product_id = c.product_id
@@ -47,7 +48,7 @@ try {
 
         $stock = (int)$item['stock'];
 
-        if ($item['status'] === 'Out of Stock' || $stock <= 0) {
+        if ($item['status'] === 'Out of Stock' || $stock <= 0 || (int)$item['is_active'] === 0) {
 
             $delete = $pdo->prepare("
                 DELETE FROM cart
@@ -60,7 +61,7 @@ try {
                 $_SESSION['user_id']
             ]);
 
-            header('Location: cart.php?err=' . urlencode('Product is out of stock.'));
+            header('Location: cart.php?err=' . urlencode('Product is no longer available.'));
             exit;
         }
 
@@ -92,7 +93,7 @@ try {
         $stmt = $pdo->prepare("
             SELECT stock, status
             FROM products
-            WHERE product_id = ?
+            WHERE product_id = ? AND is_active = 1
         ");
 
         $stmt->execute([$productId]);

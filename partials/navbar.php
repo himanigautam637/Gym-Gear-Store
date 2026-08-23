@@ -50,7 +50,7 @@ $searchValue = trim($_GET['search'] ?? '');
             </div>
 
             <div>
-                <div class="brand-name">ONLINE GYM GEAR</div>
+                <div class="brand-name">GYM GEAR</div>
                 <div class="brand-tag">STORE</div>
             </div>
 

@@ -1,8 +1,9 @@
 <?php
 require '../Admin/session_check.php';
-require '../db_connect.php'; 
+require '../db_connect.php';
 
 $search = trim($_GET['search'] ?? '');
+$view = ($_GET['status'] ?? 'active') === 'archived' ? 'archived' : 'active';
 
 $products = [];
 try {
@@ -12,10 +13,11 @@ try {
                (SELECT pi.image_path FROM product_images pi WHERE pi.product_id = p.product_id ORDER BY pi.image_id ASC LIMIT 1) AS thumbnail
         FROM products p
         LEFT JOIN categories cat ON cat.category_id = p.category_id
+        WHERE p.is_active = ?
     ";
-    $params = [];
+    $params = [$view === 'archived' ? 0 : 1];
     if ($search !== '') {
-        $sql .= " WHERE p.product_name LIKE ? OR cat.category_name LIKE ? ";
+        $sql .= " AND (p.product_name LIKE ? OR cat.category_name LIKE ?) ";
         $params[] = '%' . $search . '%';
         $params[] = '%' . $search . '%';
     }
@@ -25,9 +27,8 @@ try {
     $stmt->execute($params);
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    $products = [];
+    die($e->getMessage());
 }
-
 
 $galleries = [];
 try {
@@ -54,7 +55,7 @@ $error   = $_GET['err'] ?? '';
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Products | Gym Gear Store</title>
+<title>Products | Online Gym Gear Store</title>
 <link rel="stylesheet" href="../Admin/assets/admin.css?v=2">
 <style>
     .gallery { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
@@ -78,13 +79,23 @@ $error   = $_GET['err'] ?? '';
     .admin-search button:hover { background: var(--navy-light); }
     .admin-search .clear-search { font-size: 12px; color: var(--text-muted); text-decoration: none; white-space: nowrap; }
     .admin-search .clear-search:hover { color: var(--red); }
+    .product-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+    .product-tab {
+        padding: 9px 18px; border-radius: 8px 8px 0 0; font-size: 13px; font-weight: bold;
+        color: var(--text-muted); text-decoration: none; border: 1px solid transparent;
+    }
+    .product-tab:hover { color: var(--navy); }
+    .product-tab.active {
+        color: var(--navy); background: var(--card); border-color: var(--border);
+        border-bottom-color: var(--card); position: relative; top: 1px;
+    }
 </style>
 </head>
 <body>
 
 <div class="sidebar">
     <div class="brand">
-        <h2>GYM GEAR STORE</h2>
+        <h2>ONLINE GYM GEAR STORE</h2>
         <span>Admin Panel</span>
     </div>
     <nav>
@@ -104,7 +115,7 @@ $error   = $_GET['err'] ?? '';
     <div class="topbar">
         <div>
             <h1>Products</h1>
-            <div class="date"><?= count($products) ?> total products</div>
+            <div class="date"><?= count($products) ?> <?= $view === 'archived' ? 'archived products' : 'total products' ?></div>
         </div>
         <div class="topbar-actions">
             <div class="admin-chip">
@@ -118,20 +129,28 @@ $error   = $_GET['err'] ?? '';
     <?php if ($message): ?><div class="alert alert-success"><?= htmlspecialchars($message) ?></div><?php endif; ?>
     <?php if ($error): ?><div class="alert alert-error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
 
+    <div class="product-tabs">
+        <a href="manage_products.php" class="product-tab <?= $view === 'active' ? 'active' : '' ?>">Active Products</a>
+        <a href="manage_products.php?status=archived" class="product-tab <?= $view === 'archived' ? 'active' : '' ?>">Archived Products</a>
+    </div>
+
     <div class="panel">
         <div class="panel-header">
-            <h2>All Products</h2>
+            <h2><?= $view === 'archived' ? 'Archived Products' : 'All Products' ?></h2>
             <form action="manage_products.php" method="GET" class="admin-search">
+                <?php if ($view === 'archived'): ?><input type="hidden" name="status" value="archived"><?php endif; ?>
                 <input type="text" name="search" placeholder="Search products..." value="<?= htmlspecialchars($search) ?>">
                 <button type="submit">Search</button>
                 <?php if ($search !== ''): ?>
-                    <a href="manage_products.php" class="clear-search">Clear</a>
+                    <a href="manage_products.php<?= $view === 'archived' ? '?status=archived' : '' ?>" class="clear-search">Clear</a>
                 <?php endif; ?>
             </form>
+            <?php if ($view === 'active'): ?>
             <?php if (empty($categories)): ?>
                 <span style="font-size:12px;color:var(--red);">Add a category first before adding products.</span>
             <?php else: ?>
                 <button class="btn btn-primary" onclick="openAddProduct()">+ Add Product</button>
+            <?php endif; ?>
             <?php endif; ?>
         </div>
         <table>
@@ -149,7 +168,7 @@ $error   = $_GET['err'] ?? '';
             </thead>
             <tbody>
                 <?php if (empty($products)): ?>
-                    <tr><td colspan="8" class="empty-row"><?= $search !== '' ? 'No products matched "' . htmlspecialchars($search) . '".' : 'No products added yet.' ?></td></tr>
+                    <tr><td colspan="8" class="empty-row"><?= $search !== '' ? 'No products matched "' . htmlspecialchars($search) . '".' : ($view === 'archived' ? 'No archived products.' : 'No products added yet.') ?></td></tr>
                 <?php else: ?>
                     <?php foreach ($products as $p): ?>
                     <tr>
@@ -166,13 +185,18 @@ $error   = $_GET['err'] ?? '';
                         <td class="<?= $p['stock'] <= 5 ? 'stock-low' : 'stock-ok' ?>"><?= (int)$p['stock'] ?></td>
                         <td><span class="badge <?= $p['status'] === 'Available' ? 'Delivered' : 'Cancelled' ?>"><?= htmlspecialchars($p['status']) ?></span></td>
                         <td>
-                            <button class="btn-icon btn-edit"
-                                onclick='openEditProduct(<?= json_encode($p, JSON_HEX_APOS | JSON_HEX_QUOT) ?>, <?= json_encode($galleries[$p['product_id']] ?? [], JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>Edit</button>
-                            <button class="btn-icon" style="color:var(--green);"
-                                onclick="openRestock(<?= $p['product_id'] ?>, '<?= htmlspecialchars(addslashes($p['product_name'])) ?>', <?= $p['price'] ?>)">Restock</button>
-                            <a class="btn-icon btn-delete"
-                               href="delete_product.php?id=<?= $p['product_id'] ?>"
-                               onclick="return confirmDelete('Delete this product and all its images? This cannot be undone.')">Delete</a>
+                            <?php if ($view === 'archived'): ?>
+                                <a class="btn-icon" style="color:var(--green);"
+                                   href="restore_product.php?id=<?= $p['product_id'] ?>">Restore</a>
+                            <?php else: ?>
+                                <button class="btn-icon btn-edit"
+                                    onclick='openEditProduct(<?= json_encode($p, JSON_HEX_APOS | JSON_HEX_QUOT) ?>, <?= json_encode($galleries[$p['product_id']] ?? [], JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>Edit</button>
+                                <button class="btn-icon" style="color:var(--green);"
+                                    onclick="openRestock(<?= $p['product_id'] ?>, '<?= htmlspecialchars(addslashes($p['product_name'])) ?>', <?= $p['price'] ?>)">Restock</button>
+                                <a class="btn-icon btn-delete"
+                                   href="delete_product.php?id=<?= $p['product_id'] ?>"
+                                   onclick="return confirmDelete('Remove this product from the store? It will be archived, not permanently deleted.')">Delete</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -182,7 +206,6 @@ $error   = $_GET['err'] ?? '';
     </div>
 </div>
 
-<!-- Add / Edit Product Modal -->
 <div class="modal-overlay" id="productModal">
     <div class="modal-box">
         <h2 id="productModalTitle">Add Product</h2>

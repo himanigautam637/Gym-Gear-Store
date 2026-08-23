@@ -25,7 +25,7 @@
                 </div>
 
                 <div>
-                    <div class="brand-name">ONLINE GYM GEAR</div>
+                    <div class="brand-name">GYM GEAR</div>
                     <div class="brand-tag">STORE</div>
                 </div>
 
@@ -111,7 +111,7 @@
 
         <span>
             &copy; <?= date('Y') ?>
-            Online Gym Gear Store.
+         GYM GEAR Store.
             All rights reserved.
         </span>
 

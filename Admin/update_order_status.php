@@ -87,7 +87,7 @@ try {
                     </tbody>
                 </table>
                 <p style='text-align:right;font-size:16px;font-weight:bold;color:#0C2340;'>Order Total: Rs. " . number_format((float)$customer['total_amount'], 2) . "</p>
-                <p>Thank you for shopping with Online Gym Gear Store.</p>
+                <p>Thank you for shopping with GYM GEAR STORE.</p>
             </div>
         ";
 

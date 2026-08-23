@@ -33,7 +33,7 @@ try {
 
 
     $cartStmt = $pdo->prepare("
-        SELECT c.cart_id, c.product_id, c.quantity, p.price, p.stock, p.product_name
+        SELECT c.cart_id, c.product_id, c.quantity, p.price, p.stock, p.product_name, p.is_active
         FROM cart c
         JOIN products p ON p.product_id = c.product_id
         WHERE c.user_id = ?
@@ -46,8 +46,12 @@ try {
         exit;
     }
 
-    
     foreach ($cartItems as $item) {
+        if ((int)$item['is_active'] === 0) {
+            $pdo->prepare("DELETE FROM cart WHERE cart_id = ?")->execute([$item['cart_id']]);
+            header('Location: ../Cart/cart.php?err=' . urlencode($item['product_name'] . ' is no longer available and was removed from your cart.'));
+            exit;
+        }
         if ($item['quantity'] > $item['stock']) {
             header('Location: ../Cart/cart.php?err=' . urlencode($item['product_name'] . ' only has ' . $item['stock'] . ' left in stock.'));
             exit;
