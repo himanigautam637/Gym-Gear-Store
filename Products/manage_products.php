@@ -17,9 +17,23 @@ try {
     ";
     $params = [$view === 'archived' ? 0 : 1];
     if ($search !== '') {
-        $sql .= " AND (p.product_name LIKE ? OR cat.category_name LIKE ?) ";
+        $searchVariant = preg_match('/s$/i', $search)
+            ? substr($search, 0, -1)
+            : $search . 's';
+
+        $sql .= "
+            AND (
+                p.product_name LIKE ? OR p.product_name LIKE ?
+                OR p.description LIKE ? OR p.description LIKE ?
+                OR cat.category_name LIKE ? OR cat.category_name LIKE ?
+            )
+        ";
         $params[] = '%' . $search . '%';
+        $params[] = '%' . $searchVariant . '%';
         $params[] = '%' . $search . '%';
+        $params[] = '%' . $searchVariant . '%';
+        $params[] = '%' . $search . '%';
+        $params[] = '%' . $searchVariant . '%';
     }
     $sql .= " ORDER BY p.product_id DESC";
 
@@ -27,7 +41,7 @@ try {
     $stmt->execute($params);
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die($e->getMessage());
+    $products = [];
 }
 
 $galleries = [];
@@ -55,7 +69,7 @@ $error   = $_GET['err'] ?? '';
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Products | Online Gym Gear Store</title>
+<title>Products | Gym Gear Store</title>
 <link rel="stylesheet" href="../Admin/assets/admin.css?v=2">
 <style>
     .gallery { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
@@ -95,7 +109,7 @@ $error   = $_GET['err'] ?? '';
 
 <div class="sidebar">
     <div class="brand">
-        <h2>ONLINE GYM GEAR STORE</h2>
+        <h2>GYM GEAR STORE</h2>
         <span>Admin Panel</span>
     </div>
     <nav>

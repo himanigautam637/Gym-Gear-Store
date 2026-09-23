@@ -621,7 +621,7 @@ if ($isLoggedIn) {
                 <div>
 
                     <div class="brand-name">
-                        ONLINE GYM GEAR
+                     GYM GEAR
                     </div>
 
                     <div class="brand-tag">

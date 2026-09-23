@@ -1,6 +1,5 @@
 <?php
-ini_set('session.gc_maxlifetime', 30 * 24 * 60 * 60);
-session_set_cookie_params(30 * 24 * 60 * 60);
+session_name('gym_admin_session');
 session_start();
 
 if (isset($_SESSION['admin_id'])) {
@@ -11,7 +10,7 @@ if (isset($_SESSION['admin_id'])) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require $_SERVER['DOCUMENT_ROOT'] . '/Gym-Gear-Store/db_connect.php'; // shared connection file at project root
+    require $_SERVER['DOCUMENT_ROOT'] . '/Gym-Gear-Store/db_connect.php';
 
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -24,10 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($admin && password_verify($password, $admin['password'])) {
-            $_SESSION['admin_id']      = $admin['admin_id'];
-            $_SESSION['admin_name']    = $admin['full_name'];
+            session_regenerate_id(true);
+            $_SESSION['admin_id']       = $admin['admin_id'];
+            $_SESSION['admin_name']     = $admin['full_name'];
             $_SESSION['admin_username'] = $admin['username'];
-            $_SESSION['last_activity'] = time();
+            $_SESSION['last_activity']  = time();
             header('Location: admin_dashboard.php');
             exit;
         } else {
@@ -225,11 +225,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (input.type === 'password') {
             input.type = 'text';
-            
             icon.innerHTML = '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23" stroke="#666" stroke-width="1.8"/>';
         } else {
             input.type = 'password';
-           
             icon.innerHTML = '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/>';
         }
     }

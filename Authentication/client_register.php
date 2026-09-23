@@ -6,93 +6,133 @@ if (isset($_SESSION['user_id'])) {
     exit;
 }
 
-$error = '';
+$errors = [
+    'full_name' => '',
+    'email' => '',
+    'username' => '',
+    'password' => ''
+];
+
+$values = [
+    'full_name' => '',
+    'email' => '',
+    'phone' => '',
+    'address' => '',
+    'username' => ''
+];
+
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require $_SERVER['DOCUMENT_ROOT'] . '/Gym-Gear-Store/db_connect.php';
 
-    $full_name = trim($_POST['full_name'] ?? '');
-    $email     = trim($_POST['email'] ?? '');
-    $phone     = trim($_POST['phone'] ?? '');
-    $address   = trim($_POST['address'] ?? '');
-    $username  = trim($_POST['username'] ?? '');
-    $password  = $_POST['password'] ?? '';
+    $values['full_name'] = trim($_POST['full_name'] ?? '');
+    $values['email']     = trim($_POST['email'] ?? '');
+    $values['phone']     = trim($_POST['phone'] ?? '');
+    $values['address']   = trim($_POST['address'] ?? '');
+    $values['username']  = trim($_POST['username'] ?? '');
+    $password            = $_POST['password'] ?? '';
 
-    if ($full_name === '' || $email === '' || $username === '' || $password === '') {
-        $error = 'Please fill in all required fields.';
-    } elseif (strlen($full_name) < 3) {
-        $error = 'Full name must be at least 3 characters long.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Please enter a valid email address.';
-    } elseif (strlen($username) < 4) {
-        $error = 'Username must be at least 4 characters long.';
+    if ($values['full_name'] === '') {
+        $errors['full_name'] = 'Full name is required.';
+    } elseif (!preg_match('/^[A-Za-z\s\'\.\-]+$/', $values['full_name'])) {
+        $errors['full_name'] = 'Only letters, spaces, hyphens, apostrophes, and periods are allowed.';
+    } elseif (strlen($values['full_name']) < 2 || strlen($values['full_name']) > 100) {
+        $errors['full_name'] = 'Full name must be between 2 and 100 characters.';
+    }
+
+    if ($values['email'] === '') {
+        $errors['email'] = 'Email is required.';
+    } elseif (strlen($values['email']) > 254) {
+        $errors['email'] = 'Email address is too long.';
+    } elseif (strpos($values['email'], ' ') !== false) {
+        $errors['email'] = 'Email address cannot contain spaces.';
+    } elseif (!preg_match('/^[A-Za-z][A-Za-z0-9_+-]*(\.[A-Za-z0-9_+-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/', $values['email'])) {
+        $errors['email'] = 'Enter a valid email address (e.g. name@example.com).';
+    }
+
+    if ($values['username'] === '') {
+        $errors['username'] = 'Username is required.';
+    } elseif (strlen($values['username']) < 4) {
+        $errors['username'] = 'Username must be at least 4 characters long.';
     } else {
+        $firstChar = $values['username'][0];
+        $starts_with_letter = ($firstChar >= 'a' && $firstChar <= 'z') || ($firstChar >= 'A' && $firstChar <= 'Z');
 
-        $username_valid = true;
-        for ($i = 0; $i < strlen($username); $i++) {
-            $ch = $username[$i];
-            $is_letter = ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z');
-            $is_digit  = ($ch >= '0' && $ch <= '9');
-            $is_underscore = ($ch === '_');
-            if (!$is_letter && !$is_digit && !$is_underscore) {
-                $username_valid = false;
-                break;
-            }
-        }
-
-        if (!$username_valid) {
-            $error = 'Username can only contain letters, numbers, and underscores.';
+        if (!$starts_with_letter) {
+            $errors['username'] = 'Username must start with a letter.';
         } else {
-
-            $has_min_length = strlen($password) >= 8;
-            $has_upper = false;
-            $has_lower = false;
-            $has_number  = false;
-            $has_special = false;
-            $special_chars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
-
-            for ($i = 0; $i < strlen($password); $i++) {
-                $char = $password[$i];
-                if ($char >= 'A' && $char <= 'Z') {
-                    $has_upper = true;
-                }
-                if ($char >= 'a' && $char <= 'z') {
-                    $has_lower = true;
-                }
-                if ($char >= '0' && $char <= '9') {
-                    $has_number = true;
-                }
-                if (strpos($special_chars, $char) !== false) {
-                    $has_special = true;
+            $username_valid = true;
+            for ($i = 0; $i < strlen($values['username']); $i++) {
+                $ch = $values['username'][$i];
+                $is_letter = ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z');
+                $is_digit  = ($ch >= '0' && $ch <= '9');
+                $is_underscore = ($ch === '_');
+                if (!$is_letter && !$is_digit && !$is_underscore) {
+                    $username_valid = false;
+                    break;
                 }
             }
-
-            if (!$has_min_length) {
-                $error = 'Password must be at least 8 characters long.';
-            } elseif (!$has_upper) {
-                $error = 'Password must contain at least one uppercase letter.';
-            } elseif (!$has_lower) {
-                $error = 'Password must contain at least one lowercase letter.';
-            } elseif (!$has_number) {
-                $error = 'Password must contain at least one number.';
-            } elseif (!$has_special) {
-                $error = 'Password must contain at least one special character (e.g. ! @ # $ %).';
-            } else {
-                $stmt = $pdo->prepare("SELECT user_id FROM users WHERE username = ? OR email = ?");
-                $stmt->execute([$username, $email]);
-
-                if ($stmt->fetch()) {
-                    $error = 'Username or email is already registered.';
-                } else {
-                    $hashed = password_hash($password, PASSWORD_DEFAULT);
-                    $stmt = $pdo->prepare("INSERT INTO users (full_name, email, phone, address, username, password) VALUES (?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$full_name, $email, $phone, $address, $username, $hashed]);
-                    $success = 'Account created successfully.';
-                }
+            if (!$username_valid) {
+                $errors['username'] = 'Username can only contain letters, numbers, and underscores.';
             }
         }
     }
+
+    if ($password === '') {
+        $errors['password'] = 'Password is required.';
+    } else {
+        $has_min_length = strlen($password) >= 8;
+        $has_upper = false;
+        $has_lower = false;
+        $has_number = false;
+        $has_special = false;
+        $special_chars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+        for ($i = 0; $i < strlen($password); $i++) {
+            $char = $password[$i];
+            if ($char >= 'A' && $char <= 'Z') $has_upper = true;
+            if ($char >= 'a' && $char <= 'z') $has_lower = true;
+            if ($char >= '0' && $char <= '9') $has_number = true;
+            if (strpos($special_chars, $char) !== false) $has_special = true;
+        }
+
+        if (!$has_min_length) {
+            $errors['password'] = 'Password must be at least 8 characters long.';
+        } elseif (!$has_upper) {
+            $errors['password'] = 'Password must contain at least one uppercase letter.';
+        } elseif (!$has_lower) {
+            $errors['password'] = 'Password must contain at least one lowercase letter.';
+        } elseif (!$has_number) {
+            $errors['password'] = 'Password must contain at least one number.';
+        } elseif (!$has_special) {
+            $errors['password'] = 'Password must contain at least one special character (e.g. ! @ # $ %).';
+        }
+    }
+
+    $hasErrors = $errors['full_name'] || $errors['email'] || $errors['username'] || $errors['password'];
+
+    if (!$hasErrors) {
+        $stmt = $pdo->prepare("SELECT user_id FROM users WHERE username = ? OR email = ?");
+        $stmt->execute([$values['username'], $values['email']]);
+
+        if ($stmt->fetch()) {
+            $errors['username'] = 'Username or email is already registered.';
+            $errors['email'] = 'Username or email is already registered.';
+            $values['username'] = '';
+            $values['email'] = '';
+        } else {
+            $hashed = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("INSERT INTO users (full_name, email, phone, address, username, password) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$values['full_name'], $values['email'], $values['phone'], $values['address'], $values['username'], $hashed]);
+            $success = 'Account created successfully.';
+            $values = ['full_name' => '', 'email' => '', 'phone' => '', 'address' => '', 'username' => ''];
+        }
+    }
+
+    if ($errors['full_name']) $values['full_name'] = '';
+    if ($errors['email']) $values['email'] = '';
+    if ($errors['username']) $values['username'] = '';
 }
 ?>
 <!DOCTYPE html>
@@ -161,7 +201,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         outline: none;
     }
 
+    input.field-error { border-color: #b3261e; }
+
     input:focus { border-color: #FF6B35; }
+
+    .field-error-msg {
+        font-size: 12px;
+        color: #b3261e;
+        margin-top: 5px;
+    }
 
     .password-wrapper { position: relative; }
 
@@ -230,16 +278,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .btn-submit:hover { background-color: #e85a29; }
 
-    .error-message {
-        background-color: #fdecea;
-        color: #b3261e;
-        border: 1px solid #f5c6c2;
-        padding: 10px 12px;
-        border-radius: 6px;
-        font-size: 13px;
-        margin-bottom: 16px;
-    }
-
     .success-message {
         background-color: #e8f5e9;
         color: #2e7d32;
@@ -261,12 +299,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         text-align: center;
         font-size: 13px;
         margin-top: 14px;
+        position: relative;
+        z-index: 100;
     }
 
     .login-link a {
         color: #FF6B35;
         font-weight: bold;
         text-decoration: none;
+        display: inline-block;
+        padding: 8px 12px;
+        position: relative;
+        z-index: 100;
+        pointer-events: auto;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
     }
 </style>
 </head>
@@ -278,9 +327,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="badge-bar"></div>
     </div>
     <div class="register-body">
-        <?php if ($error): ?>
-            <div class="error-message"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
         <?php if ($success): ?>
             <div class="success-message">
                 <?= htmlspecialchars($success) ?>
@@ -291,28 +337,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" action="client_register.php" id="registerForm" autocomplete="off">
             <div class="form-group">
                 <label for="full_name">Full Name</label>
-                <input type="text" id="full_name" name="full_name" required autocomplete="off">
+                <input type="text" id="full_name" name="full_name" class="<?= $errors['full_name'] ? 'field-error' : '' ?>" value="<?= htmlspecialchars($values['full_name']) ?>" autocomplete="off" oninput="filterName(this)" onkeypress="return blockNameKey(event)">
+                <?php if ($errors['full_name']): ?><div class="field-error-msg"><?= htmlspecialchars($errors['full_name']) ?></div><?php endif; ?>
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required autocomplete="off">
+                <input type="email" id="email" name="email" class="<?= $errors['email'] ? 'field-error' : '' ?>" value="<?= htmlspecialchars($values['email']) ?>" autocomplete="off">
+                <?php if ($errors['email']): ?><div class="field-error-msg"><?= htmlspecialchars($errors['email']) ?></div><?php endif; ?>
             </div>
             <div class="form-group">
                 <label for="phone">Phone</label>
-                <input type="text" id="phone" name="phone" autocomplete="off">
+                <input type="text" id="phone" name="phone" value="<?= htmlspecialchars($values['phone']) ?>" autocomplete="off">
             </div>
             <div class="form-group">
                 <label for="address">Address</label>
-                <textarea id="address" name="address"></textarea>
+                <textarea id="address" name="address"><?= htmlspecialchars($values['address']) ?></textarea>
             </div>
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required autocomplete="off">
+                <input type="text" id="username" name="username" class="<?= $errors['username'] ? 'field-error' : '' ?>" value="<?= htmlspecialchars($values['username']) ?>" autocomplete="off" oninput="filterUsername(this)">
+                <?php if ($errors['username']): ?><div class="field-error-msg"><?= htmlspecialchars($errors['username']) ?></div><?php endif; ?>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="password-wrapper">
-                    <input type="password" id="password" name="password" required oninput="checkPassword()" autocomplete="new-password">
+                    <input type="password" id="password" name="password" class="<?= $errors['password'] ? 'field-error' : '' ?>" oninput="checkPassword()" autocomplete="new-password">
                     <button type="button" class="toggle-eye" onclick="togglePassword('password')">
                         <svg id="eyeIcon-password" viewBox="0 0 24 24">
                             <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
@@ -320,6 +369,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </svg>
                     </button>
                 </div>
+                <?php if ($errors['password']): ?><div class="field-error-msg"><?= htmlspecialchars($errors['password']) ?></div><?php endif; ?>
                 <div class="password-hint">
                     Must contain:
                     <ul>
@@ -340,6 +390,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script>
+    function blockNameKey(event) {
+        var ch = String.fromCharCode(event.which || event.keyCode);
+        return /[A-Za-z\s'.-]/.test(ch);
+    }
+
+    function filterName(el) {
+        el.value = el.value.replace(/[^A-Za-z\s'.-]/g, '');
+    }
+
+    function filterUsername(el) {
+        el.value = el.value.replace(/[^A-Za-z0-9_]/g, '');
+        if (el.value.length > 0 && !/^[A-Za-z]/.test(el.value)) {
+            el.value = el.value.replace(/^[^A-Za-z]+/, '');
+        }
+    }
+
     function checkPassword() {
         var password = document.getElementById('password').value;
         var specialChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';

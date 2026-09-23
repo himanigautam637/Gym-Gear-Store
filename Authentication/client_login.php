@@ -17,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($identifier === '' || $password === '') {
         $error = 'Please enter both fields.';
     } else {
-        // Match against either username or full_name
         $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR full_name = ?");
         $stmt->execute([$identifier, $identifier]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -39,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login | GYM GEAR STORE</title>
+<title>Login | Gym Gear Store</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -159,13 +158,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         text-align: center;
         font-size: 13px;
         margin-top: 14px;
+        position: relative;
+        z-index: 100;
     }
 
     .register-link a {
         color: #FF6B35;
         font-weight: bold;
         text-decoration: none;
+        display: inline-block;
+        padding: 8px 12px;
+        position: relative;
+        z-index: 100;
+        pointer-events: auto;
     }
+
+    .register-link a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>

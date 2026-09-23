@@ -45,25 +45,36 @@ try {
         LEFT JOIN categories c
             ON c.category_id = p.category_id
 
-        WHERE 1=1
+        WHERE p.is_active = 1
     ";
 
     $params = [];
 
     if ($search !== '') {
+        $searchVariant = preg_match('/s$/i', $search)
+            ? substr($search, 0, -1)
+            : $search . 's';
+
         $sql .= "
             AND (
                 LOWER(p.product_name) LIKE LOWER(?)
+                OR LOWER(p.product_name) LIKE LOWER(?)
                 OR LOWER(p.description) LIKE LOWER(?)
+                OR LOWER(p.description) LIKE LOWER(?)
+                OR LOWER(c.category_name) LIKE LOWER(?)
                 OR LOWER(c.category_name) LIKE LOWER(?)
             )
         ";
 
         $searchTerm = '%' . $search . '%';
+        $searchVariantTerm = '%' . $searchVariant . '%';
 
         $params[] = $searchTerm;
+        $params[] = $searchVariantTerm;
         $params[] = $searchTerm;
+        $params[] = $searchVariantTerm;
         $params[] = $searchTerm;
+        $params[] = $searchVariantTerm;
     }
 
     if ($categoryId > 0) {
@@ -82,7 +93,7 @@ try {
         $categoryStmt = $pdo->prepare("
             SELECT category_name
             FROM categories
-            WHERE category_id = ?
+            WHERE category_id = ? AND is_active = 1
         ");
 
         $categoryStmt->execute([$categoryId]);

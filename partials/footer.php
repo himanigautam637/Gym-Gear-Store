@@ -111,12 +111,8 @@
 
         <span>
             &copy; <?= date('Y') ?>
-         GYM GEAR Store.
+         GYM GEAR STORE.
             All rights reserved.
-        </span>
-
-        <span>
-            Cash on Delivery
         </span>
 
     </div>

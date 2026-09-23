@@ -1,15 +1,19 @@
 <?php
 require '../Admin/session_check.php';
-require '../db_connect.php'; 
+require '../db_connect.php';
+
+$view = ($_GET['status'] ?? 'active') === 'archived' ? 'archived' : 'active';
 
 $categories = [];
 try {
-    $stmt = $pdo->query("
+    $stmt = $pdo->prepare("
         SELECT cat.category_id, cat.category_name, cat.description,
                (SELECT COUNT(*) FROM products p WHERE p.category_id = cat.category_id) AS product_count
         FROM categories cat
+        WHERE cat.is_active = ?
         ORDER BY cat.category_id DESC
     ");
+    $stmt->execute([$view === 'archived' ? 0 : 1]);
     $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $categories = [];
@@ -23,8 +27,20 @@ $error   = $_GET['err'] ?? '';
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Categories | Gym Gear Store</title>
+<title>Categories | Online Gym Gear Store</title>
 <link rel="stylesheet" href="../Admin/assets/admin.css?v=2">
+<style>
+    .category-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+    .category-tab {
+        padding: 9px 18px; border-radius: 8px 8px 0 0; font-size: 13px; font-weight: bold;
+        color: var(--text-muted); text-decoration: none; border: 1px solid transparent;
+    }
+    .category-tab:hover { color: var(--navy); }
+    .category-tab.active {
+        color: var(--navy); background: var(--card); border-color: var(--border);
+        border-bottom-color: var(--card); position: relative; top: 1px;
+    }
+</style>
 </head>
 <body>
 
@@ -50,7 +66,7 @@ $error   = $_GET['err'] ?? '';
     <div class="topbar">
         <div>
             <h1>Categories</h1>
-            <div class="date"><?= count($categories) ?> total categories</div>
+            <div class="date"><?= count($categories) ?> <?= $view === 'archived' ? 'archived categories' : 'total categories' ?></div>
         </div>
         <div class="topbar-actions">
             <div class="admin-chip">
@@ -64,10 +80,17 @@ $error   = $_GET['err'] ?? '';
     <?php if ($message): ?><div class="alert alert-success"><?= htmlspecialchars($message) ?></div><?php endif; ?>
     <?php if ($error): ?><div class="alert alert-error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
 
+    <div class="category-tabs">
+        <a href="manage_categories.php" class="category-tab <?= $view === 'active' ? 'active' : '' ?>">Active Categories</a>
+        <a href="manage_categories.php?status=archived" class="category-tab <?= $view === 'archived' ? 'active' : '' ?>">Archived Categories</a>
+    </div>
+
     <div class="panel">
         <div class="panel-header">
-            <h2>All Categories</h2>
-            <button class="btn btn-primary" onclick="openAddCategory()">+ Add Category</button>
+            <h2><?= $view === 'archived' ? 'Archived Categories' : 'All Categories' ?></h2>
+            <?php if ($view === 'active'): ?>
+                <button class="btn btn-primary" onclick="openAddCategory()">+ Add Category</button>
+            <?php endif; ?>
         </div>
         <table>
             <thead>
@@ -80,7 +103,7 @@ $error   = $_GET['err'] ?? '';
             </thead>
             <tbody>
                 <?php if (empty($categories)): ?>
-                    <tr><td colspan="4" class="empty-row">No categories added yet. Click "Add Category" to create one.</td></tr>
+                    <tr><td colspan="4" class="empty-row"><?= $view === 'archived' ? 'No archived categories.' : 'No categories added yet. Click "Add Category" to create one.' ?></td></tr>
                 <?php else: ?>
                     <?php foreach ($categories as $c): ?>
                     <tr>
@@ -88,11 +111,16 @@ $error   = $_GET['err'] ?? '';
                         <td class="text-muted-cell"><?= htmlspecialchars(mb_strimwidth($c['description'] ?? '', 0, 90, '...')) ?></td>
                         <td><?= (int)$c['product_count'] ?></td>
                         <td>
-                            <button class="btn-icon btn-edit"
-                                onclick='openEditCategory(<?= json_encode($c, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>Edit</button>
-                            <a class="btn-icon btn-delete"
-                               href="delete_category.php?id=<?= $c['category_id'] ?>"
-                               onclick="return confirmDelete('Delete this category? This will fail if products are still linked to it.')">Delete</a>
+                            <?php if ($view === 'archived'): ?>
+                                <a class="btn-icon" style="color:var(--green);"
+                                   href="restore_category.php?id=<?= $c['category_id'] ?>">Restore</a>
+                            <?php else: ?>
+                                <button class="btn-icon btn-edit"
+                                    onclick='openEditCategory(<?= json_encode($c, JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'>Edit</button>
+                                <a class="btn-icon btn-delete"
+                                   href="delete_category.php?id=<?= $c['category_id'] ?>"
+                                   onclick="return confirmDelete('Hide this category from the store? It will be archived, not permanently deleted.')">Delete</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -101,7 +129,6 @@ $error   = $_GET['err'] ?? '';
         </table>
     </div>
 </div>
-
 
 <div class="modal-overlay" id="categoryModal">
     <div class="modal-box">
